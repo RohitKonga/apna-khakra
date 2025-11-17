@@ -21,20 +21,28 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.22.0'
           channel: 'stable'
+          cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify Flutter setup
+        run: flutter doctor -v
+
       - name: Build web
         run: |
           flutter build web --release --dart-define=API_URL=${{ secrets.API_URL || 'http://localhost:5000' }}
+        continue-on-error: false
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
           cname: ${{ secrets.CUSTOM_DOMAIN }}
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
 
