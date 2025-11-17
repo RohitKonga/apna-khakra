@@ -17,6 +17,7 @@ PORT=5000
 NODE_ENV=development
 ADMIN_PASSWORD=admin123
 FRONTEND_URL=http://localhost:3000
+# For production on Render, use: FRONTEND_URL=https://your-username.github.io/apna-khakra
 ```
 
 3. Seed database with initial product and admin:

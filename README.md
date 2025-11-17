@@ -96,15 +96,12 @@ The API will be available at `http://localhost:5000`
 flutter pub get
 ```
 
-Update API URL in `lib/src/utils/config.dart` or use build-time variable:
+For local development, use build-time variable:
 ```bash
 flutter run -d chrome --dart-define=API_URL=http://localhost:5000
 ```
 
-For production build:
-```bash
-flutter build web --release --dart-define=API_URL=https://your-backend-url.com
-```
+**For production:** The API URL is automatically set from GitHub Secrets (`API_URL`) during GitHub Actions build. No manual changes needed!
 
 ### 4. Admin Access
 
