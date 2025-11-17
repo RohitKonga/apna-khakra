@@ -33,7 +33,9 @@ jobs:
 
       - name: Build web
         run: |
-          flutter build web --release --dart-define=API_URL=${{ secrets.API_URL || 'http://localhost:5000' }}
+          flutter build web --release \
+            --base-href "/apna-khakra/" \
+            --dart-define=API_URL=${{ secrets.API_URL || 'http://localhost:5000' }}
         continue-on-error: false
 
       - name: Deploy to GitHub Pages
