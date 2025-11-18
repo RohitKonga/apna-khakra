@@ -60,7 +60,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Login')),
+      appBar: AppBar(title: const Text('Sign In')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
