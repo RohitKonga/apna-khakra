@@ -190,7 +190,7 @@ class ApiService {
         body: json.encode({'email': email, 'password': password}),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return json.decode(response.body);
       } else {
         final error = json.decode(response.body);
@@ -198,6 +198,33 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Error logging in: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> registerUser({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Config.baseUrl}/api/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'name': name,
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(response.body);
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['error'] ?? 'Registration failed');
+      }
+    } catch (e) {
+      throw Exception('Error registering: $e');
     }
   }
 }

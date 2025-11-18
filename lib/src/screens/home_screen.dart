@@ -6,6 +6,7 @@ import '../models/product.dart';
 import 'product_screen.dart';
 import 'cart_screen.dart';
 import 'admin/admin_login_screen.dart';
+import 'admin/user_signup_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -35,9 +36,10 @@ class HomeScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('User sign up coming soon'),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const UserSignUpScreen(),
                 ),
               );
             },
