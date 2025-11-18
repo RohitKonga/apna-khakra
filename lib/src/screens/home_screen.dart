@@ -111,27 +111,24 @@ class HomeScreen extends StatelessWidget {
             );
           }
 
-          if (productProvider.products.isEmpty) {
-            return const Center(
-              child: Text('No products available'),
-            );
-          }
+          final products = productProvider.products;
 
           return RefreshIndicator(
             onRefresh: () => productProvider.refreshProducts(),
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.75,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const _HeroSection(),
+                  const _HighlightsSection(),
+                  if (products.isNotEmpty)
+                    _BestSellerSection(products: products),
+                  const _AboutSection(),
+                  const _ReviewsSection(),
+                  const SizedBox(height: 32),
+                ],
               ),
-              itemCount: productProvider.products.length,
-              itemBuilder: (context, index) {
-                final product = productProvider.products[index];
-                return _ProductCard(product: product);
-              },
             ),
           );
         },
@@ -208,6 +205,226 @@ class _ProductCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _HeroSection extends StatelessWidget {
+  const _HeroSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary.withOpacity(0.15),
+            Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+          ],
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Authentic Gujarati Khakhra – Freshly Roasted',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Experience traditional flavours made with pure ingredients and slow-roasted perfection.',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 14,
+                  ),
+                ),
+                child: const Text('Shop All Flavours'),
+              ),
+              OutlinedButton(
+                onPressed: () {},
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 14,
+                  ),
+                ),
+                child: const Text('View Combos'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HighlightsSection extends StatelessWidget {
+  const _HighlightsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      ('🔥 Freshly Roasted', 'Traditional slow-roast process.'),
+      ('🌾 Pure Ingredients', '100% whole wheat, no preservatives.'),
+      ('💛 Authentic Taste', 'Home-style Gujarati flavours.'),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: items
+            .map(
+              (item) => Expanded(
+                child: Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  elevation: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          item.$1,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.$2,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _BestSellerSection extends StatelessWidget {
+  final List<Product> products;
+
+  const _BestSellerSection({required this.products});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Best Sellers',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.7,
+            ),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              final product = products[index];
+              return _ProductCard(product: product);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AboutSection extends StatelessWidget {
+  const _AboutSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Why Apna Khakhra?',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Apna Khakhra delivers the real Gujarati snack experience using authentic recipes and clean, honest ingredients. Every khakhra is slow-roasted for the perfect crunch.',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewsSection extends StatelessWidget {
+  const _ReviewsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final reviews = [
+      '⭐⭐⭐⭐⭐ “Best khakhra, super crunchy!” – Samir',
+      '⭐⭐⭐⭐⭐ “Taste exactly like homemade.” – Vaishali',
+      '⭐⭐⭐⭐⭐ “Very fresh & light!” – Kunal',
+    ];
+
+    return Container(
+      width: double.infinity,
+      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.4),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'What Our Customers Say',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 16),
+          ...reviews.map(
+            (review) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                review,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
