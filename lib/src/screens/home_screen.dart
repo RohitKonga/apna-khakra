@@ -5,6 +5,7 @@ import '../state/cart_provider.dart';
 import '../models/product.dart';
 import 'product_screen.dart';
 import 'cart_screen.dart';
+import 'admin/admin_login_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,12 +19,32 @@ class HomeScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.admin_panel_settings),
+          TextButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/admin/login');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AdminLoginScreen(),
+                ),
+              );
             },
-            tooltip: 'Admin Login',
+            child: const Text(
+              'Sign In',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('User sign up coming soon'),
+                ),
+              );
+            },
+            child: const Text(
+              'Sign Up',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           Consumer<CartProvider>(
             builder: (context, cart, _) => Stack(
