@@ -39170,7 +39170,7 @@ A.Pp.prototype={
 F(a){return new A.wU(new A.aj2(),null,null,t.J_)}}
 A.aj2.prototype={
 $4(a,b,c,d){var s=null,r=t.p
-return A.tI(A.cE(A.b([B.VH,B.c6,A.fW(A.b([A.rh(A.nN(new A.bf(B.b9,A.cE(A.b([B.GP,B.cq,A.b6(""+J.cC(b.a),s,s,s,B.zk,s,s),B.VN],r),B.Q,B.H,B.R),s),s,s,s),1),B.Q_,A.rh(A.nN(new A.bf(B.b9,A.cE(A.b([B.GH,B.cq,A.b6(""+J.cC(c.a),s,s,s,B.zk,s,s),B.VD],r),B.Q,B.H,B.R),s),s,s,s),1)],r),B.Q,B.H,B.R)],r),B.b0,B.H,B.R),B.b9,s)},
+return A.tI(A.cE(A.b([B.VI,B.c6,A.fW(A.b([A.rh(A.nN(new A.bf(B.b9,A.cE(A.b([B.GP,B.cq,A.b6(""+J.cC(b.a),s,s,s,B.zk,s,s),B.VN],r),B.Q,B.H,B.R),s),s,s,s),1),B.Q_,A.rh(A.nN(new A.bf(B.b9,A.cE(A.b([B.GH,B.cq,A.b6(""+J.cC(c.a),s,s,s,B.zk,s,s),B.VE],r),B.Q,B.H,B.R),s),s,s,s),1)],r),B.Q,B.H,B.R)],r),B.b0,B.H,B.R),B.b9,s)},
 $S:271}
 A.nG.prototype={
 af(){var s=$.ah()
@@ -39204,7 +39204,7 @@ if(o!=null){o=o.a4(t.O)
 o.toString
 o.f.iS(B.Qf)}}case 1:return A.G(q,r)}})
 return A.H($async$wn,r)},
-F(a){var s=this,r=null,q=A.jU(r,B.VI),p=A.asY(B.Gm,A.L(a).ax.b,r,80),o=A.fZ(s.e,B.nm,B.kM,1,!1,new A.agK()),n=A.fZ(s.f,B.nn,r,1,!0,new A.agL()),m=s.r,l=m?r:s.ga8N(),k=A.IE(r,r,r,r,r,r,r,r,r,r,r,r,r,r,new A.c9(A.nK(8),B.l),r,r,r,r)
+F(a){var s=this,r=null,q=A.jU(r,B.VC),p=A.asY(B.Gm,A.L(a).ax.b,r,80),o=A.fZ(s.e,B.nm,B.kM,1,!1,new A.agK()),n=A.fZ(s.f,B.nn,r,1,!0,new A.agL()),m=s.r,l=m?r:s.ga8N(),k=A.IE(r,r,r,r,r,r,r,r,r,r,r,r,r,r,new A.c9(A.nK(8),B.l),r,r,r,r)
 return A.iz(q,A.hd(A.tI(A.a30(A.cE(A.b([p,B.kG,B.Vs,B.kG,o,B.aE,n,B.c6,A.du(A.o7(m?B.e7:B.Vz,l,k),50,1/0)],t.p),B.Q,B.eJ,B.R),s.d),B.jj,r),r,r),r,r)}}
 A.agG.prototype={
 $0(){return this.a.r=!0},
@@ -39503,7 +39503,7 @@ case 6:case 1:return A.G(q,r)
 case 2:return A.F(o,r)}})
 return A.H($async$rn,r)},
 F(a){var s=this,r=null,q=A.jU(r,B.Vf),p=A.fZ(s.e,B.H5,r,1,!1,new A.apt()),o=A.fZ(s.f,B.nm,B.kM,1,!1,new A.apu()),n=A.fZ(s.r,B.nn,r,1,!0,new A.apv()),m=s.w,l=m?r:s.gacI()
-return A.iz(q,A.hd(A.tI(A.a30(A.cE(A.b([B.VC,B.c6,p,B.aE,o,B.aE,n,B.c6,A.du(A.o7(m?B.e7:B.Vg,l,r),50,1/0)],t.p),B.Q,B.eJ,B.R),s.d),B.jj,r),r,r),r,r)}}
+return A.iz(q,A.hd(A.tI(A.a30(A.cE(A.b([B.VD,B.c6,p,B.aE,o,B.aE,n,B.c6,A.du(A.o7(m?B.e7:B.Vg,l,r),50,1/0)],t.p),B.Q,B.eJ,B.R),s.d),B.jj,r),r,r),r,r)}}
 A.apr.prototype={
 $0(){return this.a.w=!0},
 $S:0}
@@ -39839,7 +39839,7 @@ o=l.d.d
 o=A.b6(o.length===0?"No description available":o,k,k,k,B.Tf,k,k)
 n=l.r
 m=t.p
-return A.iz(q,A.tI(A.cE(A.b([p,new A.bf(B.b9,A.cE(A.b([r,B.cq,s,B.aE,B.VE,B.cq,o,B.c6,A.fW(A.b([B.Vl,A.j8(k,B.GE,k,n>1?new A.amD(l):k,k,k),A.b6(""+n,k,k,k,B.dQ,k,k),A.j8(k,B.GL,k,new A.amE(l),k,k)],m),B.Q,B.H,B.R),B.c6,A.du(A.o7(B.VG,l.ga1_(),A.IE(k,k,k,k,k,k,k,k,k,k,k,k,k,k,new A.c9(A.nK(8),B.l),k,k,k,k)),50,1/0)],m),B.b0,B.H,B.R),k)],m),B.bE,B.H,B.R),k,k),k,k)}}
+return A.iz(q,A.tI(A.cE(A.b([p,new A.bf(B.b9,A.cE(A.b([r,B.cq,s,B.aE,B.VF,B.cq,o,B.c6,A.fW(A.b([B.Vl,A.j8(k,B.GE,k,n>1?new A.amD(l):k,k,k),A.b6(""+n,k,k,k,B.dQ,k,k),A.j8(k,B.GL,k,new A.amE(l),k,k)],m),B.Q,B.H,B.R),B.c6,A.du(A.o7(B.VH,l.ga1_(),A.IE(k,k,k,k,k,k,k,k,k,k,k,k,k,k,new A.c9(A.nK(8),B.l),k,k,k,k)),50,1/0)],m),B.b0,B.H,B.R),k)],m),B.bE,B.H,B.R),k,k),k,k)}}
 A.amv.prototype={
 $1(a){return a.a===this.a.a.c},
 $S:82}
@@ -90817,8 +90817,8 @@ B.VR=new A.b9("Added to cart!",null,null,null,null,null,null,null,null)
 B.Qb=new A.hE(B.VR,null,null,null,null,null,null,null,null,null,null,null,null,B.br,null,null,null,B.B,null)
 B.Vu=new A.b9("Please sign in before placing an order.",null,null,null,null,null,null,null,null)
 B.Qc=new A.hE(B.Vu,null,null,null,null,null,null,null,null,null,null,null,null,B.br,null,null,null,B.B,null)
-B.VF=new A.b9("Order placed successfully!",null,null,null,null,null,null,null,null)
-B.Qd=new A.hE(B.VF,B.tS,null,null,null,null,null,null,null,null,null,null,null,B.br,null,null,null,B.B,null)
+B.VG=new A.b9("Order placed successfully!",null,null,null,null,null,null,null,null)
+B.Qd=new A.hE(B.VG,B.tS,null,null,null,null,null,null,null,null,null,null,null,B.br,null,null,null,B.B,null)
 B.VS=new A.b9("Status updated",null,null,null,null,null,null,null,null)
 B.Qe=new A.hE(B.VS,null,null,null,null,null,null,null,null,null,null,null,null,B.br,null,null,null,B.B,null)
 B.Vy=new A.b9("Invalid email or password",null,null,null,null,null,null,null,null)
@@ -91217,12 +91217,12 @@ B.Vw=new A.b9("Cart",null,null,null,null,null,null,null,null)
 B.Vx=new A.b9("Proceed to Checkout",null,B.dQ,null,null,null,null,null,null)
 B.Vz=new A.b9("Login",null,B.dQ,null,null,null,null,null,null)
 B.VA=new A.b9("Apna Khakra",null,B.dP,null,null,null,null,null,null)
-B.VC=new A.b9("Create Account",null,B.zn,null,null,null,null,null,null)
-B.VD=new A.b9("Orders",null,null,null,null,null,null,null,null)
-B.VE=new A.b9("Description",null,B.zm,null,null,null,null,null,null)
-B.VG=new A.b9("Add to Cart",null,B.dQ,null,null,null,null,null,null)
-B.VH=new A.b9("Overview",null,B.zj,null,null,null,null,null,null)
-B.VI=new A.b9("Admin Login",null,null,null,null,null,null,null,null)
+B.VC=new A.b9("Sign In",null,null,null,null,null,null,null,null)
+B.VD=new A.b9("Create Account",null,B.zn,null,null,null,null,null,null)
+B.VE=new A.b9("Orders",null,null,null,null,null,null,null,null)
+B.VF=new A.b9("Description",null,B.zm,null,null,null,null,null,null)
+B.VH=new A.b9("Add to Cart",null,B.dQ,null,null,null,null,null,null)
+B.VI=new A.b9("Overview",null,B.zj,null,null,null,null,null,null)
 B.VJ=new A.b9("Total:",null,B.zl,null,null,null,null,null,null)
 B.VM=new A.b9("Are you sure you want to delete this product?",null,null,null,null,null,null,null,null)
 B.VN=new A.b9("Products",null,null,null,null,null,null,null,null)
