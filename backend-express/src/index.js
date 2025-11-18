@@ -6,6 +6,7 @@ const cors = require('cors');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const authRoutes = require('./routes/authRoutes');
+const seedRoutes = require('./routes/seedRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api', seedRoutes); // TEMPORARY: Remove after seeding
 
 // Health check
 app.get('/api/health', (req, res) => {
