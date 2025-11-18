@@ -19,6 +19,34 @@ router.get('/check-admin', async (req, res) => {
   }
 });
 
+// Reset admin password
+router.post('/reset-admin', async (req, res) => {
+  try {
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const passwordHash = await bcrypt.hash(adminPassword, 10);
+    
+    // Update or create admin
+    const admin = await Admin.findOneAndUpdate(
+      { email: 'admin@apnakhakra.com' },
+      { passwordHash },
+      { upsert: true, new: true }
+    );
+
+    res.json({
+      success: true,
+      message: 'Admin password reset successfully',
+      admin: {
+        email: admin.email,
+        password: adminPassword,
+        note: 'Use these credentials to login'
+      }
+    });
+  } catch (error) {
+    console.error('Reset admin error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // TEMPORARY: One-time seed endpoint
 // Remove this route after seeding production database for security
 router.post('/seed', async (req, res) => {
