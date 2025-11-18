@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
             },
             child: const Text(
               'Sign In',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.brown),
             ),
           ),
           TextButton(
@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
             },
             child: const Text(
               'Sign Up',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.brown),
             ),
           ),
           Consumer<CartProvider>(
