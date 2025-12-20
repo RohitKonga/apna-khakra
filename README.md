@@ -106,8 +106,8 @@ flutter run -d chrome --dart-define=API_URL=http://localhost:5000
 ### 4. Admin Access
 
 After seeding, login with:
-- **Email**: `admin@apnakhakra.com`
-- **Password**: `admin123` (or the password you set in `.env`)
+- **Email**: ``
+- **Password**: `` (or the password you set in `.env`)
 
 ## 🌐 Deployment
 
