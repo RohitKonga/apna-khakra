@@ -227,5 +227,54 @@ class ApiService {
       throw Exception('Error registering: $e');
     }
   }
+
+  // User Profile
+  static Future<Map<String, dynamic>> getUserProfile() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${Config.baseUrl}/api/user/profile'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['error'] ?? 'Failed to load profile');
+      }
+    } catch (e) {
+      throw Exception('Error fetching profile: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateUserProfile({
+    String? name,
+    String? email,
+    String? phone,
+    String? address,
+  }) async {
+    try {
+      final Map<String, dynamic> body = {};
+      if (name != null) body['name'] = name;
+      if (email != null) body['email'] = email;
+      if (phone != null) body['phone'] = phone;
+      if (address != null) body['address'] = address;
+
+      final response = await http.put(
+        Uri.parse('${Config.baseUrl}/api/user/profile'),
+        headers: _headers,
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['error'] ?? 'Failed to update profile');
+      }
+    } catch (e) {
+      throw Exception('Error updating profile: $e');
+    }
+  }
 }
 

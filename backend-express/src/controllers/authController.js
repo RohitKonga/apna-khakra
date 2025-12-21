@@ -80,7 +80,20 @@ exports.login = async (req, res) => {
       { expiresIn: '12h' }
     );
 
-    res.json({ token, email: account.email, role });
+    if (role === 'user') {
+      // Return user data
+      res.json({ 
+        token, 
+        email: account.email, 
+        name: account.name,
+        phone: account.phone || '',
+        address: account.address || '',
+        role 
+      });
+    } else {
+      // Admin login
+      res.json({ token, email: account.email, role });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

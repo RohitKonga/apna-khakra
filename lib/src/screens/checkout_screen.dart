@@ -23,6 +23,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isSubmitting = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Pre-fill form with user profile data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.isAuthenticated) {
+        _nameController.text = authProvider.name ?? '';
+        _emailController.text = authProvider.email ?? '';
+        _phoneController.text = authProvider.phone ?? '';
+        _addressController.text = authProvider.address ?? '';
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
@@ -75,6 +90,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
 
       await ApiService.createOrder(order);
+      
+      // Update user profile with checkout data if changed
+      if (authProvider.isAuthenticated && !authProvider.isAdmin) {
+        await authProvider.updateProfile(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          phone: _phoneController.text.trim(),
+          address: _addressController.text.trim(),
+        );
+      }
       
       cartProvider.clear();
 

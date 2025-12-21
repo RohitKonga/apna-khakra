@@ -15,23 +15,32 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: Colors.brown.shade50,
       appBar: AppBar(
+        elevation: 4,
+        backgroundColor: Colors.brown.shade100,
         title: const Text(
-          'Apna Khakra',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          'Apna Khakhra',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.brown,
+          ),
         ),
+        centerTitle: true,
         actions: [
           Consumer<AuthProvider>(
             builder: (context, auth, _) {
               if (auth.isAuthenticated) {
-                // Show profile, cart, and admin dashboard (if admin) when logged in
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (auth.isAdmin)
                       IconButton(
                         icon: const Icon(Icons.admin_panel_settings),
+                        color: Colors.brown,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -40,10 +49,9 @@ class HomeScreen extends StatelessWidget {
                             ),
                           );
                         },
-                        tooltip: 'Admin Dashboard',
                       ),
                     IconButton(
-                      icon: const Icon(Icons.person),
+                      icon: const Icon(Icons.person, color: Colors.brown),
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -52,17 +60,18 @@ class HomeScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      tooltip: 'Profile',
                     ),
                     Consumer<CartProvider>(
                       builder: (context, cart, _) => Stack(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.shopping_cart),
+                            icon: const Icon(Icons.shopping_cart, color: Colors.brown),
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const CartScreen()),
+                                MaterialPageRoute(
+                                  builder: (_) => const CartScreen(),
+                                ),
                               );
                             },
                           ),
@@ -70,15 +79,12 @@ class HomeScreen extends StatelessWidget {
                             Positioned(
                               right: 8,
                               top: 8,
-                              child: Container(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
                                 padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade400,
                                   shape: BoxShape.circle,
-                                ),
-                                constraints: const BoxConstraints(
-                                  minWidth: 16,
-                                  minHeight: 16,
                                 ),
                                 child: Text(
                                   '${cart.itemCount}',
@@ -86,7 +92,6 @@ class HomeScreen extends StatelessWidget {
                                     color: Colors.white,
                                     fontSize: 10,
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ),
@@ -96,7 +101,6 @@ class HomeScreen extends StatelessWidget {
                   ],
                 );
               } else {
-                // Show only Login button when not logged in
                 return TextButton(
                   onPressed: () {
                     Navigator.push(
@@ -106,10 +110,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(color: Colors.brown),
-                  ),
+                  child: const Text('Login', style: TextStyle(color: Colors.brown)),
                 );
               }
             },
@@ -117,42 +118,29 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: Consumer<ProductProvider>(
-        builder: (context, productProvider, _) {
-          if (productProvider.isLoading) {
+        builder: (context, provider, _) {
+          if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-
-          if (productProvider.error != null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Error: ${productProvider.error}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => productProvider.fetchProducts(),
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
+          if (provider.error != null) {
+            return Center(child: Text('Error: ${provider.error}'));
           }
 
-          final products = productProvider.products;
-
+          final products = provider.products;
           return RefreshIndicator(
-            onRefresh: () => productProvider.refreshProducts(),
+            onRefresh: () => provider.refreshProducts(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const _HeroSection(),
-                  const _HighlightsSection(),
+                  const AnimatedHeroSection(),
+                  const SizedBox(height: 12),
+                  const AnimatedHighlightsSection(),
                   if (products.isNotEmpty)
-                    _BestSellerSection(products: products),
-                  const _AboutSection(),
-                  const _ReviewsSection(),
+                    AnimatedBestSellerSection(products: products),
+                  const AnimatedAboutSection(),
+                  const AnimatedReviewsSection(),
                   const SizedBox(height: 32),
                 ],
               ),
@@ -164,71 +152,69 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _ProductCard extends StatelessWidget {
-  final Product product;
-
-  const _ProductCard({required this.product});
+/// 🎬 Animated Hero Section
+class AnimatedHeroSection extends StatelessWidget {
+  const AnimatedHeroSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(seconds: 2),
+      tween: Tween(begin: 0, end: 1),
+      builder: (context, value, child) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, 30 * (1 - value)),
+          child: child,
+        ),
       ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ProductScreen(productId: product.id),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xfff3e5ab), Color(0xfff5deb3)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
-                child: product.images.isNotEmpty
-                    ? Image.network(
-                        product.images.first,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.image, size: 60),
-                      )
-                    : const Icon(Icons.image, size: 60),
+            const Text(
+              'Authentic Gujarati Khakhra',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 10),
+            const Text(
+              'Freshly roasted with love – Taste the crunch of tradition.',
+              style: TextStyle(fontSize: 16, color: Colors.brown),
+            ),
+            const SizedBox(height: 20),
+            Wrap(
+              spacing: 12,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.brown.shade300,
+                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '₹${product.price.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+                  onPressed: () {},
+                  child: const Text('Shop Now'),
+                ),
+                OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.brown.shade300),
+                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                   ),
-                ],
-              ),
+                  child: const Text('View Combos'),
+                ),
+              ],
             ),
           ],
         ),
@@ -237,151 +223,124 @@ class _ProductCard extends StatelessWidget {
   }
 }
 
-class _HeroSection extends StatelessWidget {
-  const _HeroSection();
+/// 🌟 Animated Highlights
+class AnimatedHighlightsSection extends StatelessWidget {
+  const AnimatedHighlightsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(0.15),
-            Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-          ],
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Authentic Gujarati Khakhra – Freshly Roasted',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Experience traditional flavours made with pure ingredients and slow-roasted perfection.',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 14,
-                  ),
-                ),
-                child: const Text('Shop All Flavours'),
-              ),
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 14,
-                  ),
-                ),
-                child: const Text('View Combos'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HighlightsSection extends StatelessWidget {
-  const _HighlightsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      ('🔥 Freshly Roasted', 'Traditional slow-roast process.'),
-      ('🌾 Pure Ingredients', '100% whole wheat, no preservatives.'),
-      ('💛 Authentic Taste', 'Home-style Gujarati flavours.'),
+    final highlights = [
+      ('🔥 Freshly Roasted', 'Traditional slow-roast process'),
+      ('🌾 Pure Ingredients', '100% whole wheat, no preservatives'),
+      ('💛 Authentic Taste', 'Home-style Gujarati flavours'),
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: items
-            .map(
-              (item) => Expanded(
-                child: Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  elevation: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Text(
-                          item.$1,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          item.$2,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+        children: highlights.map((item) {
+          return Expanded(
+            child: AnimatedContainer(
+              duration: const Duration(seconds: 1),
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.brown.shade100.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(12),
               ),
-            )
-            .toList(),
+              child: Column(
+                children: [
+                  Text(item.$1, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Text(item.$2, textAlign: TextAlign.center),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 }
 
-class _BestSellerSection extends StatelessWidget {
+/// 🛍️ Best Seller Grid with Animation
+class AnimatedBestSellerSection extends StatelessWidget {
   final List<Product> products;
-
-  const _BestSellerSection({required this.products});
+  const AnimatedBestSellerSection({super.key, required this.products});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Best Sellers',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
+          const Text('Best Sellers',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 16,
               mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
               childAspectRatio: 0.7,
             ),
             itemCount: products.length,
             itemBuilder: (context, index) {
               final product = products[index];
-              return _ProductCard(product: product);
+              return TweenAnimationBuilder<double>(
+                duration: Duration(milliseconds: 400 + (index * 100)),
+                tween: Tween(begin: 0, end: 1),
+                builder: (context, value, child) => Opacity(
+                  opacity: value,
+                  child: Transform.scale(scale: value, child: child),
+                ),
+                child: Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProductScreen(productId: product.id),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius:
+                                const BorderRadius.vertical(top: Radius.circular(12)),
+                            child: Image.network(
+                              product.images.isNotEmpty
+                                  ? product.images.first
+                                  : 'https://via.placeholder.com/150',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(product.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 16)),
+                              Text('₹${product.price.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                      color: Colors.brown,
+                                      fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
             },
           ),
         ],
@@ -390,26 +349,22 @@ class _BestSellerSection extends StatelessWidget {
   }
 }
 
-class _AboutSection extends StatelessWidget {
-  const _AboutSection();
+/// 💬 About + Reviews with Parallax Feel
+class AnimatedAboutSection extends StatelessWidget {
+  const AnimatedAboutSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: const [
+          Text('Why Apna Khakhra?',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          SizedBox(height: 12),
           Text(
-            'Why Apna Khakhra?',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Apna Khakhra delivers the real Gujarati snack experience using authentic recipes and clean, honest ingredients. Every khakhra is slow-roasted for the perfect crunch.',
-            style: Theme.of(context).textTheme.bodyLarge,
+            'Apna Khakhra brings you traditional Gujarati snacks with authentic recipes and honest ingredients, roasted to perfection for that delightful crunch.',
           ),
         ],
       ),
@@ -417,37 +372,33 @@ class _AboutSection extends StatelessWidget {
   }
 }
 
-class _ReviewsSection extends StatelessWidget {
-  const _ReviewsSection();
+class AnimatedReviewsSection extends StatelessWidget {
+  const AnimatedReviewsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     final reviews = [
       '⭐⭐⭐⭐⭐ “Best khakhra, super crunchy!” – Samir',
-      '⭐⭐⭐⭐⭐ “Taste exactly like homemade.” – Vaishali',
+      '⭐⭐⭐⭐⭐ “Tastes exactly like homemade.” – Vaishali',
       '⭐⭐⭐⭐⭐ “Very fresh & light!” – Kunal',
     ];
 
     return Container(
-      width: double.infinity,
-      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.4),
+      color: Colors.brown.shade50,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'What Our Customers Say',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
+          const Text('What Our Customers Say',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           ...reviews.map(
             (review) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Text(
-                review,
-                style: Theme.of(context).textTheme.bodyMedium,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: AnimatedOpacity(
+                opacity: 1,
+                duration: const Duration(milliseconds: 600),
+                child: Text(review, style: const TextStyle(fontSize: 16)),
               ),
             ),
           ),
@@ -456,4 +407,3 @@ class _ReviewsSection extends StatelessWidget {
     );
   }
 }
-
