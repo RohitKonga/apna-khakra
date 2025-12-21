@@ -91,6 +91,25 @@ class ApiService {
     }
   }
 
+  // Get user's own orders
+  static Future<List<Order>> getUserOrders() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${Config.baseUrl}/api/orders/my-orders'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((json) => Order.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load orders');
+      }
+    } catch (e) {
+      throw Exception('Error fetching user orders: $e');
+    }
+  }
+
   static Future<Order> getOrderById(String id) async {
     try {
       final response = await http.get(
@@ -205,16 +224,22 @@ class ApiService {
     required String name,
     required String email,
     required String password,
+    String? phone,
   }) async {
     try {
+      final Map<String, dynamic> body = {
+        'name': name,
+        'email': email,
+        'password': password,
+      };
+      if (phone != null && phone.isNotEmpty) {
+        body['phone'] = phone;
+      }
+      
       final response = await http.post(
         Uri.parse('${Config.baseUrl}/api/auth/register'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'name': name,
-          'email': email,
-          'password': password,
-        }),
+        body: json.encode(body),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {

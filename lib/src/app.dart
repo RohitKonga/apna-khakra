@@ -5,6 +5,7 @@ import 'state/product_provider.dart';
 import 'state/cart_provider.dart';
 import 'state/auth_provider.dart';
 import 'state/order_provider.dart';
+import 'state/user_order_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/admin/admin_login_screen.dart';
 import 'screens/admin/admin_dashboard_screen.dart';
@@ -20,6 +21,7 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => UserOrderProvider()),
       ],
       child: MaterialApp(
         title: 'Apna Khakra',

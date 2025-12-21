@@ -39,6 +39,17 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
+// Get user's orders (User only - filtered by email)
+exports.getUserOrders = async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    const orders = await Order.find({ email: userEmail }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Get single order (Admin only)
 exports.getOrderById = async (req, res) => {
   try {

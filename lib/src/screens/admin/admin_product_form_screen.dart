@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../state/product_provider.dart';
 import '../../models/product.dart';
 
+// Brand Palette consistent with your other screens
+const kAccentColor = Color(0xFFFF6B35); 
+const kPrimaryColor = Color(0xFF2D5A27); 
+const kBgColor = Color(0xFFFFF9F2);
+
 class AdminProductFormScreen extends StatefulWidget {
   final Product? product;
-
   const AdminProductFormScreen({super.key, this.product});
 
   @override
@@ -43,9 +48,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     super.dispose();
   }
 
+  // --- Logic remains exactly as you provided ---
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isSubmitting = true);
 
     try {
@@ -74,117 +79,176 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.product == null
-                ? 'Product created'
-                : 'Product updated'),
+            content: Text(widget.product == null ? 'Product created ✨' : 'Product updated ✅'),
+            backgroundColor: kPrimaryColor,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.redAccent),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: kBgColor,
       appBar: AppBar(
-        title: Text(widget.product == null ? 'New Product' : 'Edit Product'),
+        backgroundColor: kBgColor,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: kPrimaryColor, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          widget.product == null ? 'Add New Product' : 'Edit Details',
+          style: GoogleFonts.dmSerifDisplay(color: kPrimaryColor, fontSize: 24),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
+              const SizedBox(height: 10),
+              Text(
+                "Product Essentials",
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black38),
+              ),
+              const SizedBox(height: 16),
+              
+              _buildModernField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Product Name',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter product name';
-                  }
-                  return null;
-                },
+                label: "Product Name",
+                icon: Icons.fastfood_outlined,
+                hint: "e.g. Masala Khakhra",
+                validator: (v) => (v == null || v.isEmpty) ? 'Name is required' : null,
               ),
-              const SizedBox(height: 16),
-              TextFormField(
+              const SizedBox(height: 20),
+              
+              _buildModernField(
                 controller: _slugController,
-                decoration: const InputDecoration(
-                  labelText: 'Slug (URL-friendly)',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter slug';
-                  }
-                  return null;
-                },
+                label: "URL Slug",
+                icon: Icons.link_rounded,
+                hint: "e.g. masala-khakhra",
+                validator: (v) => (v == null || v.isEmpty) ? 'Slug is required' : null,
+              ),
+              const SizedBox(height: 20),
+              
+              _buildModernField(
+                controller: _priceController,
+                label: "Price (₹)",
+                icon: Icons.payments_outlined,
+                hint: "0.00",
+                keyboardType: TextInputType.number,
+                validator: (v) => (v == null || double.tryParse(v) == null) ? 'Invalid price' : null,
+              ),
+              const SizedBox(height: 32),
+              
+              Text(
+                "Content & Media",
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black38),
               ),
               const SizedBox(height: 16),
-              TextFormField(
+              
+              _buildModernField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
-                ),
+                label: "Description",
+                icon: Icons.description_outlined,
+                hint: "Describe the taste, ingredients, etc...",
                 maxLines: 4,
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Price (₹)',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter price';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
+              const SizedBox(height: 20),
+              
+              _buildModernField(
                 controller: _imagesController,
-                decoration: const InputDecoration(
-                  labelText: 'Image URLs (comma-separated)',
-                  border: OutlineInputBorder(),
-                ),
+                label: "Image URLs",
+                icon: Icons.image_search_rounded,
+                hint: "https://image1.jpg, https://image2.jpg",
                 maxLines: 3,
               ),
-              const SizedBox(height: 24),
+              
+              const SizedBox(height: 40),
+              
+              // Action Button
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 60,
                 child: ElevatedButton(
                   onPressed: _isSubmitting ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    elevation: 0,
+                  ),
                   child: _isSubmitting
-                      ? const CircularProgressIndicator()
-                      : Text(widget.product == null ? 'Create' : 'Update'),
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          widget.product == null ? 'Create Product' : 'Save Changes',
+                          style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600),
+                        ),
                 ),
               ),
+              const SizedBox(height: 50),
             ],
           ),
         ),
       ),
     );
   }
-}
 
+  Widget _buildModernField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    required String hint,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          keyboardType: keyboardType,
+          validator: validator,
+          style: GoogleFonts.poppins(fontSize: 15),
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: hint,
+            hintStyle: const TextStyle(color: Colors.black26, fontSize: 13),
+            prefixIcon: Icon(icon, color: kPrimaryColor, size: 20),
+            filled: true,
+            fillColor: Colors.white,
+            labelStyle: const TextStyle(color: Colors.black45),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: kPrimaryColor.withOpacity(0.05)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: kAccentColor, width: 1.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

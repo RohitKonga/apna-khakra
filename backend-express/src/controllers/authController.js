@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 // Register regular user
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email and password are required' });
@@ -24,7 +24,8 @@ exports.register = async (req, res) => {
     const user = await User.create({
       name,
       email: email.toLowerCase(),
-      passwordHash
+      passwordHash,
+      phone: phone || ''
     });
 
     const token = jwt.sign(
