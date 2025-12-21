@@ -193,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     decoration: const InputDecoration(
                       labelText: 'Phone Number',
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.phone),
+                      prefixIcon: Icon(Icons.call),
                     ),
                     keyboardType: TextInputType.phone,
                     enabled: _isEditing && !auth.isAdmin,
