@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/product_provider.dart';
 import '../state/cart_provider.dart';
+import '../state/auth_provider.dart';
 import '../models/product.dart';
 import 'product_screen.dart';
 import 'cart_screen.dart';
 import 'admin/admin_login_screen.dart';
 import 'admin/user_signup_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,33 +22,59 @@ class HomeScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const AdminLoginScreen(),
-                ),
-              );
+          Consumer<AuthProvider>(
+            builder: (context, auth, _) {
+              if (auth.isAuthenticated) {
+                // Show profile button when logged in
+                return IconButton(
+                  icon: const Icon(Icons.person),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ProfileScreen(),
+                      ),
+                    );
+                  },
+                  tooltip: 'Profile',
+                );
+              } else {
+                // Show Sign In and Sign Up when not logged in
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AdminLoginScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Sign In',
+                        style: TextStyle(color: Colors.brown),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const UserSignUpScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(color: Colors.brown),
+                      ),
+                    ),
+                  ],
+                );
+              }
             },
-            child: const Text(
-              'Sign In',
-              style: TextStyle(color: Colors.brown),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const UserSignUpScreen(),
-                ),
-              );
-            },
-            child: const Text(
-              'Sign Up',
-              style: TextStyle(color: Colors.brown),
-            ),
           ),
           Consumer<CartProvider>(
             builder: (context, cart, _) => Stack(

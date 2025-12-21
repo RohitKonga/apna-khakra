@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import '../../state/auth_provider.dart';
+import '../home_screen.dart';
 
 class UserSignUpScreen extends StatefulWidget {
   const UserSignUpScreen({super.key});
@@ -45,12 +46,17 @@ class _UserSignUpScreenState extends State<UserSignUpScreen> {
       );
 
       if (mounted) {
-        Navigator.of(context).pop(); // go back to previous screen
+        // Navigate to home and clear stack
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Welcome, ${response['name'] ?? _nameController.text.trim()}',
+              'Welcome, ${response['name'] ?? _nameController.text.trim()}!',
             ),
+            backgroundColor: Colors.green,
           ),
         );
       }
