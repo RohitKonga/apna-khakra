@@ -1,3 +1,4 @@
+import 'package:apna_khakra/src/screens/cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -109,6 +110,16 @@ class _ProductScreenState extends State<ProductScreen> {
     );
   }
 
+    Widget _circleIconButton(IconData icon, VoidCallback onTap) {
+    return Container(
+      margin: const EdgeInsets.all(8),
+      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [
+        BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
+      ]),
+      child: IconButton(icon: Icon(icon, color: Colors.black87, size: 20), onPressed: onTap),
+    );
+  }
+
   PreferredSizeWidget _buildTransparentAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent,
@@ -126,9 +137,27 @@ class _ProductScreenState extends State<ProductScreen> {
       actions: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.white.withOpacity(0.9),
-            child: const Icon(Icons.favorite_border, color: Colors.red),
+          child: Consumer<CartProvider>(
+            builder: (context, cart, _) => Stack(
+              children: [
+                _circleIconButton(Icons.shopping_bag_outlined, () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CartScreen()),
+                  );
+                }),
+                if (cart.itemCount > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: const BoxDecoration(color: kAccentColor, shape: BoxShape.circle),
+                      child: Text('${cart.itemCount}', style: const TextStyle(color: Colors.white, fontSize: 10)),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ],
