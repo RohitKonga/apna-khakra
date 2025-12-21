@@ -99,7 +99,7 @@ class CartScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kAccentColor,
+                  backgroundColor: kPrimaryColor,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
