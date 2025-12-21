@@ -1,3 +1,4 @@
+import 'package:apna_khakra/src/screens/admin/admin_product_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -187,7 +188,12 @@ class _DashboardHome extends StatelessWidget {
           icon: Icons.add_box_outlined, 
           title: "Add New Product", 
           subtitle: "Launch a new flavor", 
-          onTap: () {} // Logic for navigation can be added here
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AdminProductFormScreen()),
+            );
+          } // Logic for navigation can be added here
         ),
         _QuickActionRow(
           icon: Icons.analytics_outlined, 
