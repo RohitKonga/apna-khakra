@@ -1,4 +1,3 @@
-import 'package:apna_khakra/src/screens/admin/admin_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart'; // Add this to pubspec.yaml
@@ -6,14 +5,53 @@ import '../state/product_provider.dart';
 import '../state/cart_provider.dart';
 import '../state/auth_provider.dart';
 import '../models/product.dart';
+import '../models/cart_item.dart';
+import 'admin/admin_login_screen.dart';
+import 'profile_screen.dart';
+import 'cart_screen.dart';
+import 'product_screen.dart';
 
 // --- THEME CONSTANTS ---
 const kAccentColor = Color(0xFFFF6B35); // Vibrant Orange/Terracotta
 const kPrimaryColor = Color(0xFF2D5A27); // Elegant Sage/Deep Green
 const kBgColor = Color(0xFFFFF9F2); // Warm Cream
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _searchQuery = '';
+  List<Product> _filteredProducts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize filtered products
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<ProductProvider>(context, listen: false);
+      _filteredProducts = provider.products;
+    });
+  }
+
+  void _filterProducts(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        final provider = Provider.of<ProductProvider>(context, listen: false);
+        _filteredProducts = provider.products;
+      } else {
+        final provider = Provider.of<ProductProvider>(context, listen: false);
+        _filteredProducts = provider.products.where((product) {
+          return product.name.toLowerCase().contains(query.toLowerCase()) ||
+                 product.description.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +63,11 @@ class HomeScreen extends StatelessWidget {
         builder: (context, provider, _) {
           if (provider.isLoading) return const Center(child: CircularProgressIndicator(color: kAccentColor));
           
+          // Update filtered products when provider products change
+          if (_searchQuery.isEmpty) {
+            _filteredProducts = provider.products;
+          }
+          
           return RefreshIndicator(
             color: kAccentColor,
             onRefresh: () => provider.refreshProducts(),
@@ -35,23 +78,58 @@ class HomeScreen extends StatelessWidget {
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   sliver: SliverToBoxAdapter(
-                    child: _sectionHeader("Trending Now", "Handpicked for you"),
+                    child: _sectionHeader(
+                      _searchQuery.isEmpty ? "Trending Now" : "Search Results",
+                      _searchQuery.isEmpty ? "Handpicked for you" : "${_filteredProducts.length} items found",
+                    ),
                   ),
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.all(20),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 20,
-                      crossAxisSpacing: 20,
-                      childAspectRatio: 0.75,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => ModernProductCard(product: provider.products[index], index: index),
-                      childCount: provider.products.length,
-                    ),
-                  ),
+                  sliver: _filteredProducts.isEmpty && _searchQuery.isNotEmpty
+                      ? SliverToBoxAdapter(
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(40),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'No products found',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 18,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Try a different search term',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      : SliverGrid(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 20,
+                            crossAxisSpacing: 20,
+                            childAspectRatio: 0.75,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => ModernProductCard(
+                              product: _filteredProducts[index],
+                              index: index,
+                            ),
+                            childCount: _filteredProducts.length,
+                          ),
+                        ),
                 ),
                 const SliverToBoxAdapter(child: BrandStorySection()),
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
@@ -77,7 +155,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
 actions: [
-  // 1. ADD THIS: Login Button Logic
+  // 1. Login/Profile Button Logic
   Consumer<AuthProvider>(
     builder: (context, auth, _) {
       return _circleIconButton(
@@ -86,18 +164,23 @@ actions: [
           if (!auth.isAuthenticated) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+              MaterialPageRoute(builder: (_) => const AdminLoginScreen()),
             );
           } else {
-            // Navigate to profile if already logged in
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            );
           }
         },
       );
     },
   ),
   
-  // 2. SEARCH BUTTON (Existing)
-  _circleIconButton(Icons.search, () {}),
+  // 2. SEARCH BUTTON
+  _circleIconButton(Icons.search, () {
+    _showSearchDialog(context);
+  }),
   
   _buildCartButton(context),
   const SizedBox(width: 12),
@@ -130,7 +213,12 @@ actions: [
     return Consumer<CartProvider>(
       builder: (context, cart, _) => Stack(
         children: [
-          _circleIconButton(Icons.shopping_bag_outlined, () {}),
+          _circleIconButton(Icons.shopping_bag_outlined, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CartScreen()),
+            );
+          }),
           if (cart.itemCount > 0)
             Positioned(
               right: 8,
@@ -143,6 +231,59 @@ actions: [
             ),
         ],
       ),
+    );
+  }
+
+  void _showSearchDialog(BuildContext context) {
+    final TextEditingController searchController = TextEditingController(text: _searchQuery);
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text('Search Products', style: GoogleFonts.poppins()),
+          content: TextField(
+            controller: searchController,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: 'Enter product name...',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _searchQuery.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        searchController.clear();
+                        _filterProducts('');
+                        Navigator.of(dialogContext).pop();
+                      },
+                    )
+                  : null,
+            ),
+            onSubmitted: (value) {
+              _filterProducts(value);
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                searchController.clear();
+                _filterProducts('');
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Clear'),
+            ),
+            TextButton(
+              onPressed: () {
+                _filterProducts(searchController.text);
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Search'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -206,53 +347,79 @@ class ModernProductCard extends StatelessWidget {
         opacity: val,
         child: Transform.translate(offset: Offset(0, 20 * (1 - val)), child: child),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      image: DecorationImage(
-                        image: NetworkImage(product.images.isNotEmpty ? product.images.first : 'https://via.placeholder.com/150'),
-                        fit: BoxFit.cover,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ProductScreen(productId: product.id),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                          image: NetworkImage(product.images.isNotEmpty ? product.images.first : 'https://via.placeholder.com/150'),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 15, right: 15,
-                    child: CircleAvatar(backgroundColor: Colors.white.withOpacity(0.9), child: const Icon(Icons.favorite_border, color: Colors.red, size: 20)),
-                  )
-                ],
+                    Positioned(
+                      top: 15, right: 15,
+                      child: CircleAvatar(backgroundColor: Colors.white.withOpacity(0.9), child: const Icon(Icons.favorite_border, color: Colors.red, size: 20)),
+                    )
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(product.name, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15)),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('₹${product.price}', style: GoogleFonts.poppins(color: kAccentColor, fontWeight: FontWeight.w700)),
-                      const Icon(Icons.add_circle, color: kPrimaryColor, size: 28),
-                    ],
-                  )
-                ],
-              ),
-            )
-          ],
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(product.name, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15)),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('₹${product.price}', style: GoogleFonts.poppins(color: kAccentColor, fontWeight: FontWeight.w700)),
+                        Consumer<CartProvider>(
+                          builder: (context, cart, _) {
+                            return InkWell(
+                              onTap: () {
+                                cart.addItem(CartItem(product: product, quantity: 1));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('${product.name} added to cart'),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              child: const Icon(Icons.add_circle, color: kPrimaryColor, size: 28),
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -273,7 +440,7 @@ class BrandStorySection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.call, color: kPrimaryColor, size: 40),
+          const Icon(Icons.auto_awesome, color: kPrimaryColor, size: 40),
           const SizedBox(height: 16),
           Text(
             "Our Tradition",
