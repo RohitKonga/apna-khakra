@@ -7,7 +7,6 @@ import '../models/product.dart';
 import 'product_screen.dart';
 import 'cart_screen.dart';
 import 'admin/admin_login_screen.dart';
-import 'admin/user_signup_screen.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -25,95 +24,81 @@ class HomeScreen extends StatelessWidget {
           Consumer<AuthProvider>(
             builder: (context, auth, _) {
               if (auth.isAuthenticated) {
-                // Show profile button when logged in
-                return IconButton(
-                  icon: const Icon(Icons.person),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const ProfileScreen(),
-                      ),
-                    );
-                  },
-                  tooltip: 'Profile',
-                );
-              } else {
-                // Show Sign In and Sign Up when not logged in
+                // Show profile and cart when logged in
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextButton(
+                    IconButton(
+                      icon: const Icon(Icons.person),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const AdminLoginScreen(),
+                            builder: (_) => const ProfileScreen(),
                           ),
                         );
                       },
-                      child: const Text(
-                        'Sign In',
-                        style: TextStyle(color: Colors.brown),
-                      ),
+                      tooltip: 'Profile',
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const UserSignUpScreen(),
+                    Consumer<CartProvider>(
+                      builder: (context, cart, _) => Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.shopping_cart),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const CartScreen()),
+                              );
+                            },
                           ),
-                        );
-                      },
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(color: Colors.brown),
+                          if (cart.itemCount > 0)
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '${cart.itemCount}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ],
                 );
-              }
-            },
-          ),
-          Consumer<CartProvider>(
-            builder: (context, cart, _) => Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.shopping_cart),
+              } else {
+                // Show only Login button when not logged in
+                return TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const CartScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const AdminLoginScreen(),
+                      ),
                     );
                   },
-                ),
-                if (cart.itemCount > 0)
-                  Positioned(
-                    right: 8,
-                    top: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Text(
-                        '${cart.itemCount}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(color: Colors.brown),
                   ),
-              ],
-            ),
+                );
+              }
+            },
           ),
         ],
       ),
