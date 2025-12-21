@@ -34,7 +34,7 @@ jobs:
       - name: Build web
         run: |
           flutter build web --release \
-            --base-href "/apna-khakra/" \
+            --base-href "/" \
             --dart-define=API_URL=${{ secrets.API_URL || 'http://localhost:5000' }}
         continue-on-error: false
 
