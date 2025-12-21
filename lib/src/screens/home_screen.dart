@@ -7,6 +7,7 @@ import '../models/product.dart';
 import 'product_screen.dart';
 import 'cart_screen.dart';
 import 'admin/admin_login_screen.dart';
+import 'admin/admin_dashboard_screen.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -24,10 +25,23 @@ class HomeScreen extends StatelessWidget {
           Consumer<AuthProvider>(
             builder: (context, auth, _) {
               if (auth.isAuthenticated) {
-                // Show profile and cart when logged in
+                // Show profile, cart, and admin dashboard (if admin) when logged in
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (auth.isAdmin)
+                      IconButton(
+                        icon: const Icon(Icons.admin_panel_settings),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AdminDashboardScreen(),
+                            ),
+                          );
+                        },
+                        tooltip: 'Admin Dashboard',
+                      ),
                     IconButton(
                       icon: const Icon(Icons.person),
                       onPressed: () {

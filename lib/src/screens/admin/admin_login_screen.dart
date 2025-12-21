@@ -41,12 +41,16 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
     if (success && mounted) {
       if (authProvider.isAdmin) {
-        Navigator.of(context).pushReplacement(
+        // Clear entire stack and go to admin dashboard
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+          (route) => false,
         );
       } else {
-        Navigator.of(context).pushReplacement(
+        // Clear entire stack and go to home
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
         );
       }
     } else if (mounted) {
@@ -152,7 +156,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     const Text("Don't have an account? "),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (_) => const UserSignUpScreen(),

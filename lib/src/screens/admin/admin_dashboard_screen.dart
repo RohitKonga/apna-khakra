@@ -5,6 +5,7 @@ import '../../state/product_provider.dart';
 import '../../state/order_provider.dart';
 import 'admin_products_screen.dart';
 import 'admin_orders_screen.dart';
+import '../home_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -36,26 +37,45 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
-              await authProvider.logout();
-              if (mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-          ),
-        ],
-      ),
-      body: _screens[_selectedIndex],
+    return WillPopScope(
+      onWillPop: () async {
+        // Prevent back button - show dialog or do nothing
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Admin Dashboard'),
+          automaticallyImplyLeading: false, // Remove back button
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () async {
+                final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                await authProvider.logout();
+                if (mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    (route) => false,
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+        body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
+        onTap: (index) {
+          if (index == 3) {
+            // Home button - navigate to home screen
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          } else {
+            setState(() => _selectedIndex = index);
+          }
+        },
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
@@ -69,7 +89,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             icon: Icon(Icons.shopping_bag),
             label: 'Orders',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
         ],
+      ),
       ),
     );
   }
