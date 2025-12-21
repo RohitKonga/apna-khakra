@@ -1,3 +1,4 @@
+import 'package:apna_khakra/src/screens/admin/admin_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart'; // Add this to pubspec.yaml
@@ -75,11 +76,32 @@ class HomeScreen extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      actions: [
-        _circleIconButton(Icons.search, () {}),
-        _buildCartButton(context),
-        const SizedBox(width: 12),
-      ],
+actions: [
+  // 1. ADD THIS: Login Button Logic
+  Consumer<AuthProvider>(
+    builder: (context, auth, _) {
+      return _circleIconButton(
+        auth.isAuthenticated ? Icons.person_outline : Icons.login_rounded, 
+        () {
+          if (!auth.isAuthenticated) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+            );
+          } else {
+            // Navigate to profile if already logged in
+          }
+        },
+      );
+    },
+  ),
+  
+  // 2. SEARCH BUTTON (Existing)
+  _circleIconButton(Icons.search, () {}),
+  
+  _buildCartButton(context),
+  const SizedBox(width: 12),
+],
     );
   }
 
