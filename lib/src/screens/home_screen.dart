@@ -170,7 +170,7 @@ actions: [
               MaterialPageRoute(builder: (_) => const AdminLoginScreen()),
             );
           } else {
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const ProfileScreen()),
             );

@@ -237,48 +237,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    bool enabled = false,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(label, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black38)),
-        ),
-        TextFormField(
-          controller: controller,
-          enabled: enabled,
-          maxLines: maxLines,
-          style: GoogleFonts.poppins(fontSize: 15, color: enabled ? Colors.black87 : Colors.black45),
-          decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: enabled ? kPrimaryColor : Colors.black26, size: 20),
-            filled: true,
-            fillColor: enabled ? Colors.white : Colors.black.withOpacity(0.02),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-            disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: kPrimaryColor.withOpacity(0.1)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: kAccentColor, width: 1),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildOrderHistoryButton(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -329,6 +287,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  Widget _buildProfileField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool enabled = false,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(label, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black38)),
+        ),
+        TextFormField(
+          controller: controller,
+          enabled: enabled,
+          maxLines: maxLines,
+          style: GoogleFonts.poppins(fontSize: 15, color: enabled ? Colors.black87 : Colors.black45),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, color: enabled ? kPrimaryColor : Colors.black26, size: 20),
+            filled: true,
+            fillColor: enabled ? Colors.white : Colors.black.withOpacity(0.02),
+            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: kPrimaryColor.withOpacity(0.1)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: kAccentColor, width: 1),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
 
   Widget _buildActionButton({
     required String text,
