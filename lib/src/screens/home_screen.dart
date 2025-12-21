@@ -85,7 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width > 600 ? 40 : 20,
+                    vertical: 20,
+                  ),
                   sliver: _filteredProducts.isEmpty && _searchQuery.isNotEmpty
                       ? SliverToBoxAdapter(
                           child: Center(
@@ -116,11 +119,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                       : SliverGrid(
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
                             mainAxisSpacing: 20,
                             crossAxisSpacing: 20,
-                            childAspectRatio: 0.75,
+                            childAspectRatio: MediaQuery.of(context).size.width > 600 ? 0.7 : 0.75,
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) => ModernProductCard(

@@ -135,9 +135,7 @@ class _ProductScreenState extends State<ProductScreen> {
         ),
       ),
       actions: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Consumer<CartProvider>(
+        Consumer<CartProvider>(
             builder: (context, cart, _) => Stack(
               children: [
                 _circleIconButton(Icons.shopping_bag_outlined, () {
@@ -159,7 +157,6 @@ class _ProductScreenState extends State<ProductScreen> {
               ],
             ),
           ),
-        ),
       ],
     );
   }

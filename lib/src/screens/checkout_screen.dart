@@ -278,7 +278,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             children: [
               Text("Total Amount", style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               Text("₹${cart.totalAmount.toStringAsFixed(0)}", 
-                style: GoogleFonts.dmSerifDisplay(color: kPrimaryColor, fontSize: 26)),
+                style: GoogleFonts.dmSerifDisplay(color: Colors.white, fontSize: 26,fontWeight: FontWeight.bold)),
             ],
           ),
         ],
