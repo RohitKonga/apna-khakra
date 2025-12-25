@@ -348,16 +348,6 @@ PreferredSizeWidget _buildElegantAppBar(BuildContext context) {
       ],
     );
   }
-
-  Widget _circleIconButton(IconData icon, VoidCallback onTap) {
-    return Container(
-      margin: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [
-        BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
-      ]),
-      child: IconButton(icon: Icon(icon, color: Colors.black87, size: 20), onPressed: onTap),
-    );
-  }
 }
 
 // --- NEW COMPONENTS ---
