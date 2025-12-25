@@ -41,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-
   void _scrollToTrendingSection() {
     // Scroll to the Trending Now section
     // HeroSection (400) + CategoryQuickLinks (approx 100) + some padding
@@ -49,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const double categoryHeight = 100;
     const double padding = 20;
     final double targetOffset = heroHeight + categoryHeight + padding;
-    
+
     _scrollController.animateTo(
       targetOffset,
       duration: const Duration(milliseconds: 800),
@@ -71,13 +70,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: _buildElegantAppBar(context),
       body: Consumer<ProductProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading) return const Center(child: CircularProgressIndicator(color: kAccentColor));
-          
+          if (provider.isLoading)
+            return const Center(
+                child: CircularProgressIndicator(color: kAccentColor));
+
           // Update filtered products when provider products change
           if (_searchQuery.isEmpty) {
             _filteredProducts = provider.products;
           }
-          
+
           return RefreshIndicator(
             color: kAccentColor,
             onRefresh: () => provider.refreshProducts(),
@@ -85,7 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _scrollController,
               slivers: [
                 SliverToBoxAdapter(
-                  child: HeroSection(onExplorePressed: _scrollToTrendingSection),
+                  child:
+                      HeroSection(onExplorePressed: _scrollToTrendingSection),
                 ),
                 const SliverToBoxAdapter(child: CategoryQuickLinks()),
                 SliverPadding(
@@ -94,13 +96,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     key: _trendingSectionKey,
                     child: _sectionHeader(
                       _searchQuery.isEmpty ? "Trending Now" : "Search Results",
-                      _searchQuery.isEmpty ? "Handpicked for you" : "${_filteredProducts.length} items found",
+                      _searchQuery.isEmpty
+                          ? "Handpicked for you"
+                          : "${_filteredProducts.length} items found",
                     ),
                   ),
                 ),
                 SliverPadding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width > 600 ? 40 : 20,
+                    horizontal:
+                        MediaQuery.of(context).size.width > 600 ? 40 : 20,
                     vertical: 20,
                   ),
                   sliver: _filteredProducts.isEmpty && _searchQuery.isNotEmpty
@@ -110,7 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: const EdgeInsets.all(40),
                               child: Column(
                                 children: [
-                                  Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                                  Icon(Icons.search_off,
+                                      size: 64, color: Colors.grey[400]),
                                   const SizedBox(height: 16),
                                   Text(
                                     'No products found',
@@ -133,11 +139,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                       : SliverGrid(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount:
+                                MediaQuery.of(context).size.width > 600 ? 4 : 2,
                             mainAxisSpacing: 20,
                             crossAxisSpacing: 20,
-                            childAspectRatio: MediaQuery.of(context).size.width > 600 ? 0.7 : 0.75,
+                            childAspectRatio:
+                                MediaQuery.of(context).size.width > 600
+                                    ? 0.65
+                                    : 0.7,
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) => ModernProductCard(
@@ -158,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-PreferredSizeWidget _buildElegantAppBar(BuildContext context) {
+  PreferredSizeWidget _buildElegantAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: kBgColor.withOpacity(0.8),
       elevation: 0,
@@ -175,46 +186,47 @@ PreferredSizeWidget _buildElegantAppBar(BuildContext context) {
       actions: [
         // --- 1. SEARCH BAR ---
 // --- 1. SEARCH ICON ---
-Padding(
-  padding: const EdgeInsets.only(top: 8.0, left: 8.0),
-  child: Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const SearchScreen()),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              )
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SearchScreen()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
+                  ),
+                  child:
+                      const Icon(Icons.search, color: kPrimaryColor, size: 20),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Search',
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: kPrimaryColor,
+                ),
+              ),
             ],
           ),
-          child: const Icon(Icons.search, color: kPrimaryColor, size: 20),
         ),
-      ),
-      const SizedBox(height: 4),
-      Text(
-        'Search',
-        style: GoogleFonts.poppins(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: kPrimaryColor,
-        ),
-      ),
-    ],
-  ),
-),
         // --- 2. LOGIN / PROFILE / ADMIN DASHBOARD ---
         Consumer<AuthProvider>(
           builder: (context, auth, _) {
@@ -222,7 +234,7 @@ Padding(
             IconData icon;
             String label;
             Widget destination;
-            
+
             if (auth.isAuthenticated) {
               if (auth.isAdmin) {
                 icon = Icons.admin_panel_settings;
@@ -238,7 +250,7 @@ Padding(
               label = 'Login';
               destination = const AdminLoginScreen();
             }
-            
+
             return Padding(
               padding: const EdgeInsets.only(top: 8.0, left: 8.0),
               child: GestureDetector(
@@ -333,15 +345,15 @@ Padding(
                                 color: kAccentColor,
                                 shape: BoxShape.circle,
                               ),
-                              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                              constraints: const BoxConstraints(
+                                  minWidth: 16, minHeight: 16),
                               child: Text(
                                 '${cart.itemCount}',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  color: Colors.white, 
-                                  fontSize: 8, 
-                                  fontWeight: FontWeight.bold
-                                ),
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
@@ -370,8 +382,11 @@ Padding(
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: GoogleFonts.dmSerifDisplay(fontSize: 28, color: Colors.black87)),
-        Text(sub, style: GoogleFonts.poppins(color: Colors.black45, fontSize: 14)),
+        Text(title,
+            style: GoogleFonts.dmSerifDisplay(
+                fontSize: 28, color: Colors.black87)),
+        Text(sub,
+            style: GoogleFonts.poppins(color: Colors.black45, fontSize: 14)),
         const SizedBox(height: 10),
       ],
     );
@@ -396,11 +411,13 @@ class HeroSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Badge(label: Text("NEW ARRIVAL"), backgroundColor: kAccentColor),
+          const Badge(
+              label: Text("NEW ARRIVAL"), backgroundColor: kAccentColor),
           const SizedBox(height: 16),
           Text(
             "The Art of\nGujarati Crunch.",
-            style: GoogleFonts.dmSerifDisplay(fontSize: 42, color: Colors.white, height: 1.1),
+            style: GoogleFonts.dmSerifDisplay(
+                fontSize: 42, color: Colors.white, height: 1.1),
           ),
           const SizedBox(height: 16),
           Text(
@@ -413,10 +430,12 @@ class HeroSection extends StatelessWidget {
               backgroundColor: Colors.white,
               foregroundColor: kPrimaryColor,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
             ),
             onPressed: onExplorePressed,
-            child: const Text("Explore Flavour Palette", style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text("Explore Flavour Palette",
+                style: TextStyle(fontWeight: FontWeight.bold)),
           )
         ],
       ),
@@ -427,7 +446,17 @@ class HeroSection extends StatelessWidget {
 class ModernProductCard extends StatelessWidget {
   final Product product;
   final int index;
-  const ModernProductCard({super.key, required this.product, required this.index});
+  const ModernProductCard(
+      {super.key, required this.product, required this.index});
+
+  // Helper function to truncate product name to max words
+  String _truncateProductName(String name, {int maxWords = 4}) {
+    final words = name.split(' ');
+    if (words.length <= maxWords) {
+      return name;
+    }
+    return '${words.take(maxWords).join(' ')}...';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -436,7 +465,8 @@ class ModernProductCard extends StatelessWidget {
       tween: Tween(begin: 0, end: 1),
       builder: (context, val, child) => Opacity(
         opacity: val,
-        child: Transform.translate(offset: Offset(0, 20 * (1 - val)), child: child),
+        child: Transform.translate(
+            offset: Offset(0, 20 * (1 - val)), child: child),
       ),
       child: InkWell(
         onTap: () {
@@ -452,12 +482,19 @@ class ModernProductCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))],
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10))
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
+              // Fixed height image container to prevent shrinking
+              SizedBox(
+                height: 180,
                 child: Stack(
                   children: [
                     Container(
@@ -465,20 +502,29 @@ class ModernProductCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         image: DecorationImage(
-                          image: NetworkImage(product.images.isNotEmpty ? product.images.first : 'https://via.placeholder.com/150'),
+                          image: NetworkImage(product.images.isNotEmpty
+                              ? product.images.first
+                              : 'https://via.placeholder.com/150'),
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                     Positioned(
-                      top: 15, right: 15,
-                      child: CircleAvatar(backgroundColor: Colors.white.withOpacity(0.9), child: const Icon(Icons.favorite_border, color: Colors.red, size: 20)),
+                      top: 15,
+                      right: 15,
+                      child: CircleAvatar(
+                          backgroundColor: Colors.white.withOpacity(0.9),
+                          child: const Icon(Icons.favorite_border,
+                              color: Colors.red, size: 20)),
                     ),
                     if (product.stockQuantity == 0)
                       Positioned(
-                        bottom: 15, left: 15, right: 15,
+                        bottom: 15,
+                        left: 15,
+                        right: 15,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(12),
@@ -502,31 +548,45 @@ class ModernProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(product.name, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(
+                      _truncateProductName(product.name, maxWords: 4),
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold, fontSize: 15),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('₹${product.price}', style: GoogleFonts.poppins(color: kAccentColor, fontWeight: FontWeight.w700)),
+                        Text('₹${product.price}',
+                            style: GoogleFonts.poppins(
+                                color: kAccentColor,
+                                fontWeight: FontWeight.w700)),
                         product.stockQuantity > 0
                             ? Consumer<CartProvider>(
                                 builder: (context, cart, _) {
                                   return InkWell(
                                     onTap: () {
-                                      cart.addItem(CartItem(product: product, quantity: 1));
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      cart.addItem(CartItem(
+                                          product: product, quantity: 1));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         SnackBar(
-                                          content: Text('${product.name} added to cart'),
+                                          content: Text(
+                                              '${product.name} added to cart'),
                                           duration: const Duration(seconds: 1),
                                         ),
                                       );
                                     },
-                                    child: const Icon(Icons.add_circle, color: kPrimaryColor, size: 28),
+                                    child: const Icon(Icons.add_circle,
+                                        color: kPrimaryColor, size: 28),
                                   );
                                 },
                               )
                             : Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: Colors.red.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
@@ -571,7 +631,8 @@ class BrandStorySection extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             "Our Tradition",
-            style: GoogleFonts.dmSerifDisplay(fontSize: 24, color: kPrimaryColor),
+            style:
+                GoogleFonts.dmSerifDisplay(fontSize: 24, color: kPrimaryColor),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -606,7 +667,8 @@ class CategoryQuickLinks extends StatelessWidget {
             border: Border.all(color: Colors.black12),
             borderRadius: BorderRadius.circular(30),
           ),
-          child: Text(cats[i], style: const TextStyle(fontWeight: FontWeight.w500)),
+          child: Text(cats[i],
+              style: const TextStyle(fontWeight: FontWeight.w500)),
         ),
       ),
     );
