@@ -125,7 +125,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     _buildTextField(
                       controller: _emailController,
                       label: "Email Address",
-                      hint: "hello@apnakhakhra.com",
+                      hint: "Enter your email",
                       icon: Icons.alternate_email_rounded,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) => (value == null || value.isEmpty) ? 'Enter email' : null,
@@ -136,7 +136,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     _buildTextField(
                       controller: _passwordController,
                       label: "Password",
-                      hint: "••••••••",
+                      hint: "Enter your password",
                       icon: Icons.lock_outline_rounded,
                       obscureText: _obscurePassword,
                       suffixIcon: IconButton(

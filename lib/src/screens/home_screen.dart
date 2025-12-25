@@ -26,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   List<Product> _filteredProducts = [];
+  bool _isSearchExpanded = false; // Tracks if the textfield is visible
 
   @override
   void initState() {
@@ -160,49 +161,74 @@ PreferredSizeWidget _buildElegantAppBar(BuildContext context) {
       ),
       actions: [
         // --- 1. SEARCH BAR ---
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0, left: 8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 130, // Balanced width for search
-                height: 38,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: TextField(
-                  onChanged: _filterProducts,
-                  style: GoogleFonts.poppins(fontSize: 12, color: kPrimaryColor),
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                    hintStyle: GoogleFonts.poppins(fontSize: 11, color: Colors.black26),
-                    border: InputBorder.none,
-                    prefixIcon: Icon(Icons.search, color: kPrimaryColor, size: 18),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+        // --- 1. DYNAMIC SEARCH BAR ---
+Padding(
+  padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+  child: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: _isSearchExpanded ? 160 : 40, // Expands from circle to pill
+        height: 38,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: _isSearchExpanded
+            ? TextField(
+                onChanged: _filterProducts,
+                style: GoogleFonts.poppins(fontSize: 12, color: kPrimaryColor),
+                autofocus: true, // Focus automatically when it appears
+                decoration: InputDecoration(
+                  hintText: 'Search...',
+                  hintStyle: GoogleFonts.poppins(fontSize: 11, color: Colors.black26),
+                  border: InputBorder.none,
+                  prefixIcon: Icon(Icons.search, color: kPrimaryColor, size: 18),
+                  // Close button to collapse back
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isSearchExpanded = false;
+                        _filterProducts(''); // Clear search on close
+                      });
+                    },
+                    child: Icon(Icons.close, size: 16, color: kAccentColor),
                   ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 ),
+              )
+            : IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.search, color: kPrimaryColor, size: 20),
+                onPressed: () {
+                  setState(() {
+                    _isSearchExpanded = true;
+                  });
+                },
               ),
-              const SizedBox(height: 4),
-              Text(
-                'Search',
-                style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: kPrimaryColor,
-                ),
-              ),
-            ],
+      ),
+      const SizedBox(height: 4),
+      // Only show text if NOT expanded
+      if (!_isSearchExpanded)
+        Text(
+          'Search',
+          style: GoogleFonts.poppins(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: kPrimaryColor,
           ),
         ),
+    ],
+  ),
+),
 
         // --- 2. LOGIN / PROFILE ---
         Consumer<AuthProvider>(

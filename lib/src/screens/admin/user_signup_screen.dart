@@ -129,7 +129,7 @@ class _UserSignUpScreenState extends State<UserSignUpScreen> {
                     _buildInputField(
                       controller: _nameController,
                       label: "Full Name",
-                      hint: "Jayesh Patel",
+                      hint: "Enter your name",
                       icon: Icons.person_outline_rounded,
                       validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter your name' : null,
                     ),
@@ -138,7 +138,7 @@ class _UserSignUpScreenState extends State<UserSignUpScreen> {
                     _buildInputField(
                       controller: _emailController,
                       label: "Email Address",
-                      hint: "jayesh@example.com",
+                      hint: "Enter your email",
                       icon: Icons.alternate_email_rounded,
                       keyboardType: TextInputType.emailAddress,
                       validator: (v) => (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
@@ -148,7 +148,7 @@ class _UserSignUpScreenState extends State<UserSignUpScreen> {
                     _buildInputField(
                       controller: _phoneController,
                       label: "Phone Number",
-                      hint: "98765 43210",
+                      hint: "Enter your phone number",
                       icon: Icons.phone_android_rounded,
                       keyboardType: TextInputType.phone,
                       validator: (v) => (v != null && v.length < 10) ? 'Enter a valid phone number' : null,
@@ -158,7 +158,7 @@ class _UserSignUpScreenState extends State<UserSignUpScreen> {
                     _buildInputField(
                       controller: _passwordController,
                       label: "Password",
-                      hint: "••••••••",
+                      hint: "Enter your password",
                       icon: Icons.lock_outline_rounded,
                       obscureText: _obscurePassword,
                       suffixIcon: IconButton(
@@ -180,7 +180,7 @@ class _UserSignUpScreenState extends State<UserSignUpScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _signUp,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kAccentColor, // Different color for Sign Up to distinguish
+                          backgroundColor: kPrimaryColor, // Different color for Sign Up to distinguish
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
