@@ -8,5 +8,8 @@ router.post('/register', authController.register);
 // Login for both admin and user
 router.post('/login', authController.login);
 
+// Forgot password
+router.post('/forgot-password', authController.forgotPassword);
+
 module.exports = router;
 

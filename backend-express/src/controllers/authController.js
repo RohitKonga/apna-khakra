@@ -100,3 +100,60 @@ exports.login = async (req, res) => {
   }
 };
 
+// Forgot Password - Verify email and phone, then reset password
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email, phone, newPassword } = req.body;
+
+    if (!email || !phone || !newPassword) {
+      return res.status(400).json({ error: 'Email, phone, and new password are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    const lowerEmail = email.toLowerCase();
+    // Normalize phone: remove spaces, dashes, and other non-digit characters (except +)
+    const normalizedPhone = phone.trim().replace(/[\s\-\(\)]/g, '');
+
+    // Find user with matching email
+    const user = await User.findOne({ email: lowerEmail });
+
+    if (!user) {
+      return res.status(404).json({ 
+        error: 'Email and phone number do not match any account' 
+      });
+    }
+
+    // Normalize stored phone for comparison
+    const storedPhoneNormalized = (user.phone || '').replace(/[\s\-\(\)]/g, '');
+
+    // Verify phone number matches
+    if (storedPhoneNormalized !== normalizedPhone) {
+      return res.status(404).json({ 
+        error: 'Email and phone number do not match any account' 
+      });
+    }
+
+    if (!user) {
+      return res.status(404).json({ 
+        error: 'Email and phone number do not match any account' 
+      });
+    }
+
+    // Update password
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    user.passwordHash = passwordHash;
+    await user.save();
+
+    return res.json({ 
+      success: true, 
+      message: 'Password reset successfully. You can now login with your new password.'
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Failed to reset password. Please try again.' });
+  }
+};
+

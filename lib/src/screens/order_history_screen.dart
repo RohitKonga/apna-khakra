@@ -20,8 +20,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   void initState() {
     super.initState();
+    // Refresh orders when screen is visited to get latest status updates
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<UserOrderProvider>(context, listen: false).fetchUserOrders();
+      Provider.of<UserOrderProvider>(context, listen: false).refreshUserOrders();
     });
   }
 

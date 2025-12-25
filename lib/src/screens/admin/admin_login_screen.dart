@@ -5,6 +5,7 @@ import '../../state/auth_provider.dart';
 import 'admin_dashboard_screen.dart';
 import '../home_screen.dart';
 import 'user_signup_screen.dart';
+import 'forgot_password_screen.dart';
 
 // Matching constants from Home Screen
 const kAccentColor = Color(0xFFFF6B35); 
@@ -152,7 +153,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                          );
+                        },
                         child: Text("Forgot Password?", style: TextStyle(color: kAccentColor.withOpacity(0.8))),
                       ),
                     ),

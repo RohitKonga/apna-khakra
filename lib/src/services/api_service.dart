@@ -253,6 +253,33 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> forgotPassword({
+    required String email,
+    required String phone,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Config.baseUrl}/api/auth/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': email,
+          'phone': phone,
+          'newPassword': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['error'] ?? 'Failed to reset password');
+      }
+    } catch (e) {
+      throw Exception('Error resetting password: $e');
+    }
+  }
+
   // User Profile
   static Future<Map<String, dynamic>> getUserProfile() async {
     try {

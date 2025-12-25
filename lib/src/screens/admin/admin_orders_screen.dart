@@ -186,11 +186,15 @@ class _OrderExpansionCard extends StatelessWidget {
             );
           }).toList(),
           onChanged: (newStatus) async {
-            if (newStatus != null) {
-              await provider.updateOrderStatus(order.id, newStatus);
+            if (newStatus != null && newStatus != order.status) {
+              final success = await provider.updateOrderStatus(order.id, newStatus);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Status Updated Successfully'), behavior: SnackBarBehavior.floating),
+                  SnackBar(
+                    content: Text(success ? 'Status Updated Successfully' : 'Failed to update status. Please try again.'),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: success ? kPrimaryColor : Colors.redAccent,
+                  ),
                 );
               }
             }

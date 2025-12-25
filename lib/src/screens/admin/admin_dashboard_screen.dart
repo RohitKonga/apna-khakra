@@ -110,6 +110,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HomeScreen()));
           } else {
             setState(() => _selectedIndex = index);
+            // Refresh orders when Orders tab is selected
+            if (index == 2) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Provider.of<OrderProvider>(context, listen: false).refreshOrders();
+              });
+            }
           }
         },
         type: BottomNavigationBarType.fixed,
