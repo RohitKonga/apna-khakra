@@ -100,6 +100,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildProfileHeader(auth),
                   const SizedBox(height: 40),
                   
+                  // My Orders Button (only for regular users) - Show first
+                  if (!auth.isAdmin)
+                    _buildOrderHistoryButton(context),
+                  
+                  if (!auth.isAdmin)
+                    const SizedBox(height: 30),
+                  
                   // Info Fields
                   _buildProfileField(
                     controller: _nameController,
@@ -131,10 +138,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                   const SizedBox(height: 40),
-
-                  // My Orders Button (only for regular users)
-                  if (!auth.isAdmin)
-                    _buildOrderHistoryButton(context),
 
                   const SizedBox(height: 20),
 

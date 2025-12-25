@@ -7,6 +7,7 @@ import '../state/auth_provider.dart';
 import '../models/product.dart';
 import '../models/cart_item.dart';
 import 'admin/admin_login_screen.dart';
+import 'admin/admin_dashboard_screen.dart';
 import 'profile_screen.dart';
 import 'cart_screen.dart';
 import 'product_screen.dart';
@@ -230,20 +231,37 @@ Padding(
   ),
 ),
 
-        // --- 2. LOGIN / PROFILE ---
+        // --- 2. LOGIN / PROFILE / ADMIN DASHBOARD ---
         Consumer<AuthProvider>(
           builder: (context, auth, _) {
+            // Determine icon, label, and destination based on auth state
+            IconData icon;
+            String label;
+            Widget destination;
+            
+            if (auth.isAuthenticated) {
+              if (auth.isAdmin) {
+                icon = Icons.admin_panel_settings;
+                label = 'Admin';
+                destination = const AdminDashboardScreen();
+              } else {
+                icon = Icons.person_outline;
+                label = 'Profile';
+                destination = const ProfileScreen();
+              }
+            } else {
+              icon = Icons.login_rounded;
+              label = 'Login';
+              destination = const AdminLoginScreen();
+            }
+            
             return Padding(
               padding: const EdgeInsets.only(top: 8.0, left: 8.0),
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => auth.isAuthenticated 
-                        ? const ProfileScreen() 
-                        : const AdminLoginScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => destination),
                   );
                 },
                 child: Column(
@@ -263,14 +281,14 @@ Padding(
                         ],
                       ),
                       child: Icon(
-                        auth.isAuthenticated ? Icons.person_outline : Icons.login_rounded,
+                        icon,
                         color: kPrimaryColor,
                         size: 20,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      auth.isAuthenticated ? 'Profile' : 'Login',
+                      label,
                       style: GoogleFonts.poppins(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
