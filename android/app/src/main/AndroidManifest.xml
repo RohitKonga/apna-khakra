@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="apna_khakra"
+        android:label="Apna Khakra"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
