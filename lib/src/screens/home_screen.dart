@@ -1,3 +1,4 @@
+import 'package:apna_khakra/src/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart'; // Add this to pubspec.yaml
@@ -27,7 +28,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   List<Product> _filteredProducts = [];
-  bool _isSearchExpanded = false; // Tracks if the textfield is visible
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _trendingSectionKey = GlobalKey();
 
   @override
   void initState() {
@@ -39,20 +41,26 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _filterProducts(String query) {
-    setState(() {
-      _searchQuery = query;
-      if (query.isEmpty) {
-        final provider = Provider.of<ProductProvider>(context, listen: false);
-        _filteredProducts = provider.products;
-      } else {
-        final provider = Provider.of<ProductProvider>(context, listen: false);
-        _filteredProducts = provider.products.where((product) {
-          return product.name.toLowerCase().contains(query.toLowerCase()) ||
-                 product.description.toLowerCase().contains(query.toLowerCase());
-        }).toList();
-      }
-    });
+
+  void _scrollToTrendingSection() {
+    // Scroll to the Trending Now section
+    // HeroSection (400) + CategoryQuickLinks (approx 100) + some padding
+    const double heroHeight = 400;
+    const double categoryHeight = 100;
+    const double padding = 20;
+    final double targetOffset = heroHeight + categoryHeight + padding;
+    
+    _scrollController.animateTo(
+      targetOffset,
+      duration: const Duration(milliseconds: 800),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -74,12 +82,16 @@ class _HomeScreenState extends State<HomeScreen> {
             color: kAccentColor,
             onRefresh: () => provider.refreshProducts(),
             child: CustomScrollView(
+              controller: _scrollController,
               slivers: [
-                const SliverToBoxAdapter(child: HeroSection()),
+                SliverToBoxAdapter(
+                  child: HeroSection(onExplorePressed: _scrollToTrendingSection),
+                ),
                 const SliverToBoxAdapter(child: CategoryQuickLinks()),
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   sliver: SliverToBoxAdapter(
+                    key: _trendingSectionKey,
                     child: _sectionHeader(
                       _searchQuery.isEmpty ? "Trending Now" : "Search Results",
                       _searchQuery.isEmpty ? "Handpicked for you" : "${_filteredProducts.length} items found",
@@ -162,75 +174,47 @@ PreferredSizeWidget _buildElegantAppBar(BuildContext context) {
       ),
       actions: [
         // --- 1. SEARCH BAR ---
-        // --- 1. DYNAMIC SEARCH BAR ---
+// --- 1. SEARCH ICON ---
 Padding(
   padding: const EdgeInsets.only(top: 8.0, left: 8.0),
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        width: _isSearchExpanded ? 160 : 40, // Expands from circle to pill
-        height: 38,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
-        ),
-        child: _isSearchExpanded
-            ? TextField(
-                onChanged: _filterProducts,
-                style: GoogleFonts.poppins(fontSize: 12, color: kPrimaryColor),
-                autofocus: true, // Focus automatically when it appears
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: GoogleFonts.poppins(fontSize: 11, color: Colors.black26),
-                  border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search, color: kPrimaryColor, size: 18),
-                  // Close button to collapse back
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isSearchExpanded = false;
-                        _filterProducts(''); // Clear search on close
-                      });
-                    },
-                    child: Icon(Icons.close, size: 16, color: kAccentColor),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                ),
+      GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SearchScreen()),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               )
-            : IconButton(
-                padding: EdgeInsets.zero,
-                icon: Icon(Icons.search, color: kPrimaryColor, size: 20),
-                onPressed: () {
-                  setState(() {
-                    _isSearchExpanded = true;
-                  });
-                },
-              ),
+            ],
+          ),
+          child: const Icon(Icons.search, color: kPrimaryColor, size: 20),
+        ),
       ),
       const SizedBox(height: 4),
-      // Only show text if NOT expanded
-      if (!_isSearchExpanded)
-        Text(
-          'Search',
-          style: GoogleFonts.poppins(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: kPrimaryColor,
-          ),
+      Text(
+        'Search',
+        style: GoogleFonts.poppins(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: kPrimaryColor,
         ),
+      ),
     ],
   ),
 ),
-
         // --- 2. LOGIN / PROFILE / ADMIN DASHBOARD ---
         Consumer<AuthProvider>(
           builder: (context, auth, _) {
@@ -397,7 +381,8 @@ Padding(
 // --- NEW COMPONENTS ---
 
 class HeroSection extends StatelessWidget {
-  const HeroSection({super.key});
+  final VoidCallback? onExplorePressed;
+  const HeroSection({super.key, this.onExplorePressed});
 
   @override
   Widget build(BuildContext context) {
@@ -430,7 +415,7 @@ class HeroSection extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            onPressed: () {},
+            onPressed: onExplorePressed,
             child: const Text("Explore Flavour Palette", style: TextStyle(fontWeight: FontWeight.bold)),
           )
         ],

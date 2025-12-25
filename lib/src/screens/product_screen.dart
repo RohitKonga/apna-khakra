@@ -257,7 +257,7 @@ class _ProductScreenState extends State<ProductScreen> {
               // Add to Bag Button
               Expanded(
                 child: SizedBox(
-                  height: 56,
+                  height: 46,
                   child: ElevatedButton(
                     onPressed: _addToCart,
                     style: ElevatedButton.styleFrom(
