@@ -147,8 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisSpacing: 20,
                             childAspectRatio:
                                 MediaQuery.of(context).size.width > 600
-                                    ? 0.65
-                                    : 0.7,
+                                    ? 0.7
+                                    : 0.75,
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) => ModernProductCard(
@@ -449,15 +449,6 @@ class ModernProductCard extends StatelessWidget {
   const ModernProductCard(
       {super.key, required this.product, required this.index});
 
-  // Helper function to truncate product name to max words
-  String _truncateProductName(String name, {int maxWords = 4}) {
-    final words = name.split(' ');
-    if (words.length <= maxWords) {
-      return name;
-    }
-    return '${words.take(maxWords).join(' ')}...';
-  }
-
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
@@ -492,9 +483,7 @@ class ModernProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Fixed height image container to prevent shrinking
-              SizedBox(
-                height: 180,
+              Expanded(
                 child: Stack(
                   children: [
                     Container(
@@ -548,13 +537,9 @@ class ModernProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _truncateProductName(product.name, maxWords: 4),
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold, fontSize: 15),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    Text(product.name,
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold, fontSize: 15)),
                     const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
