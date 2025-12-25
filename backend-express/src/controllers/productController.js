@@ -26,17 +26,25 @@ exports.getProductById = async (req, res) => {
 // Create product (Admin only)
 exports.createProduct = async (req, res) => {
   try {
-    const { name, slug, description, price, images } = req.body;
+    const { name, slug, description, actualPrice, marginPrice, stockQuantity, images } = req.body;
     
-    if (!name || !slug || price === undefined) {
-      return res.status(400).json({ error: 'Name, slug, and price are required' });
+    if (!name || !slug) {
+      return res.status(400).json({ error: 'Name and slug are required' });
     }
+
+    // Calculate price from actualPrice + marginPrice
+    const actualPriceNum = actualPrice !== undefined ? Number(actualPrice) : 0;
+    const marginPriceNum = marginPrice !== undefined ? Number(marginPrice) : 0;
+    const calculatedPrice = actualPriceNum + marginPriceNum;
 
     const product = await Product.create({
       name,
       slug,
       description: description || '',
-      price: Number(price),
+      price: calculatedPrice, // Price is calculated from actualPrice + marginPrice
+      actualPrice: actualPriceNum,
+      marginPrice: marginPriceNum,
+      stockQuantity: stockQuantity !== undefined ? Number(stockQuantity) : 0,
       images: images || []
     });
 
@@ -52,7 +60,7 @@ exports.createProduct = async (req, res) => {
 // Update product (Admin only)
 exports.updateProduct = async (req, res) => {
   try {
-    const { name, slug, description, price, images } = req.body;
+    const { name, slug, description, actualPrice, marginPrice, stockQuantity, images } = req.body;
     
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -62,8 +70,15 @@ exports.updateProduct = async (req, res) => {
     if (name) product.name = name;
     if (slug) product.slug = slug;
     if (description !== undefined) product.description = description;
-    if (price !== undefined) product.price = Number(price);
+    if (actualPrice !== undefined) product.actualPrice = Number(actualPrice);
+    if (marginPrice !== undefined) product.marginPrice = Number(marginPrice);
+    if (stockQuantity !== undefined) product.stockQuantity = Number(stockQuantity);
     if (images !== undefined) product.images = images;
+
+    // Recalculate price from actualPrice + marginPrice
+    const actualPriceNum = product.actualPrice || 0;
+    const marginPriceNum = product.marginPrice || 0;
+    product.price = actualPriceNum + marginPriceNum;
 
     await product.save();
     res.json(product);

@@ -52,7 +52,18 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   void _addToCart() {
-    if (_product == null) return;
+    if (_product == null || _product!.stockQuantity == 0) return;
+    if (_quantity > _product!.stockQuantity) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Only ${_product!.stockQuantity} items available in stock'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.orange,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+      return;
+    }
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     cartProvider.addItem(CartItem(product: _product!, quantity: _quantity));
 
@@ -191,7 +202,15 @@ class _ProductScreenState extends State<ProductScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Badge(label: Text("AUTHENTIC"), backgroundColor: kPrimaryColor),
+            Row(
+              children: [
+                const Badge(label: Text("AUTHENTIC"), backgroundColor: kPrimaryColor),
+                if (_product!.stockQuantity == 0) ...[
+                  const SizedBox(width: 8),
+                  const Badge(label: Text("OUT OF STOCK"), backgroundColor: Colors.red),
+                ],
+              ],
+            ),
             Text('₹${_product!.price.toStringAsFixed(0)}', 
               style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: kAccentColor)),
           ],
@@ -230,6 +249,8 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   Widget _buildBottomActionTab() {
+    final isOutOfStock = _product?.stockQuantity == 0;
+    
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
@@ -240,38 +261,61 @@ class _ProductScreenState extends State<ProductScreen> {
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, -5))],
         ),
         child: SafeArea(
-          child: Row(
-            children: [
-              // Quantity Toggle
-              Container(
-                decoration: BoxDecoration(color: kBgColor, borderRadius: BorderRadius.circular(16)),
-                child: Row(
-                  children: [
-                    IconButton(onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null, icon: const Icon(Icons.remove, size: 18)),
-                    Text('$_quantity', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
-                    IconButton(onPressed: () => setState(() => _quantity++), icon: const Icon(Icons.add, size: 18)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              // Add to Bag Button
-              Expanded(
-                child: SizedBox(
+          child: isOutOfStock
+              ? SizedBox(
+                  width: double.infinity,
                   height: 46,
                   child: ElevatedButton(
-                    onPressed: _addToCart,
+                    onPressed: null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.grey.shade300,
+                      foregroundColor: Colors.grey.shade600,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
                     ),
-                    child: Text('Add to Bag', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text('Out of Stock', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
+                )
+              : Row(
+                  children: [
+                    // Quantity Toggle
+                    Container(
+                      decoration: BoxDecoration(color: kBgColor, borderRadius: BorderRadius.circular(16)),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                            icon: const Icon(Icons.remove, size: 18),
+                          ),
+                          Text('$_quantity', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+                          IconButton(
+                            onPressed: _product != null && _quantity < _product!.stockQuantity
+                                ? () => setState(() => _quantity++)
+                                : null,
+                            icon: const Icon(Icons.add, size: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Add to Bag Button
+                    Expanded(
+                      child: SizedBox(
+                        height: 46,
+                        child: ElevatedButton(
+                          onPressed: _addToCart,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kPrimaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            elevation: 0,
+                          ),
+                          child: Text('Add to Bag', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );

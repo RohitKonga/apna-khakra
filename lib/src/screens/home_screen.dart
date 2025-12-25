@@ -473,7 +473,27 @@ class ModernProductCard extends StatelessWidget {
                     Positioned(
                       top: 15, right: 15,
                       child: CircleAvatar(backgroundColor: Colors.white.withOpacity(0.9), child: const Icon(Icons.favorite_border, color: Colors.red, size: 20)),
-                    )
+                    ),
+                    if (product.stockQuantity == 0)
+                      Positioned(
+                        bottom: 15, left: 15, right: 15,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Out of Stock',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      )
                   ],
                 ),
               ),
@@ -488,22 +508,38 @@ class ModernProductCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('₹${product.price}', style: GoogleFonts.poppins(color: kAccentColor, fontWeight: FontWeight.w700)),
-                        Consumer<CartProvider>(
-                          builder: (context, cart, _) {
-                            return InkWell(
-                              onTap: () {
-                                cart.addItem(CartItem(product: product, quantity: 1));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${product.name} added to cart'),
-                                    duration: const Duration(seconds: 1),
+                        product.stockQuantity > 0
+                            ? Consumer<CartProvider>(
+                                builder: (context, cart, _) {
+                                  return InkWell(
+                                    onTap: () {
+                                      cart.addItem(CartItem(product: product, quantity: 1));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('${product.name} added to cart'),
+                                          duration: const Duration(seconds: 1),
+                                        ),
+                                      );
+                                    },
+                                    child: const Icon(Icons.add_circle, color: kPrimaryColor, size: 28),
+                                  );
+                                },
+                              )
+                            : Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'Out of Stock',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 10,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                );
-                              },
-                              child: const Icon(Icons.add_circle, color: kPrimaryColor, size: 28),
-                            );
-                          },
-                        ),
+                                ),
+                              ),
                       ],
                     )
                   ],

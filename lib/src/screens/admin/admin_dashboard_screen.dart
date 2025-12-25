@@ -7,6 +7,7 @@ import '../../state/product_provider.dart';
 import '../../state/order_provider.dart';
 import 'admin_products_screen.dart';
 import 'admin_orders_screen.dart';
+import 'admin_sales_report_screen.dart';
 import '../home_screen.dart';
 
 // Brand Constants
@@ -205,7 +206,12 @@ class _DashboardHome extends StatelessWidget {
           icon: Icons.analytics_outlined, 
           title: "Sales Report", 
           subtitle: "View this month's revenue", 
-          onTap: () {}
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AdminSalesReportScreen()),
+            );
+          }
         ),
       ],
     );

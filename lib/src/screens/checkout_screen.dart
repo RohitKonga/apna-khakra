@@ -4,15 +4,20 @@ import 'package:google_fonts/google_fonts.dart';
 import '../state/cart_provider.dart';
 import '../state/auth_provider.dart';
 import '../state/user_order_provider.dart';
+import '../state/product_provider.dart';
 import '../models/order.dart';
+import '../models/product.dart';
+import '../models/cart_item.dart';
 import '../services/api_service.dart';
 import 'home_screen.dart';
 import 'admin/admin_login_screen.dart';
+import 'product_screen.dart';
 
 // Brand Palette
 const kAccentColor = Color(0xFFFF6B35); 
 const kPrimaryColor = Color(0xFF2D5A27); 
 const kBgColor = Color(0xFFFFF9F2);
+const double kMinimumOrderValue = 149.0;
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -61,6 +66,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           const SnackBar(content: Text('Please sign in before placing an order.'))
         );
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminLoginScreen()));
+      }
+      return;
+    }
+
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    if (cartProvider.totalAmount < kMinimumOrderValue) {
+      if (mounted) {
+        final difference = kMinimumOrderValue - cartProvider.totalAmount;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Minimum order value is ₹${kMinimumOrderValue.toStringAsFixed(0)}. Add ₹${difference.toStringAsFixed(0)} more.'),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 3),
+          ),
+        );
       }
       return;
     }
@@ -184,6 +204,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   
                   _buildSummaryCard(cart),
                   
+                  if (cart.totalAmount < kMinimumOrderValue) ...[
+                    const SizedBox(height: 16),
+                    _buildMinimumOrderWarning(cart),
+                    const SizedBox(height: 16),
+                    Consumer<ProductProvider>(
+                      builder: (context, productProvider, _) {
+                        final difference = kMinimumOrderValue - cart.totalAmount;
+                        final suggestions = _getProductSuggestions(
+                          productProvider.products,
+                          cart.items.map((item) => item.product.id).toList(),
+                          difference,
+                        );
+                        if (suggestions.isNotEmpty) {
+                          return _buildProductSuggestions(suggestions);
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
+                  
                   const SizedBox(height: 40),
                   
                   // Final Action Button
@@ -244,16 +284,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildSummaryCard(CartProvider cart) {
+    final isBelowMinimum = cart.totalAmount < kMinimumOrderValue;
+    final difference = kMinimumOrderValue - cart.totalAmount;
+    
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [kPrimaryColor.withOpacity(0.9), kPrimaryColor],
+          colors: isBelowMinimum 
+              ? [Colors.orange.withOpacity(0.9), Colors.orange]
+              : [kPrimaryColor.withOpacity(0.9), kPrimaryColor],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: kPrimaryColor.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+        boxShadow: [BoxShadow(
+          color: (isBelowMinimum ? Colors.orange : kPrimaryColor).withOpacity(0.3),
+          blurRadius: 20,
+          offset: const Offset(0, 10),
+        )],
       ),
       child: Column(
         children: [
@@ -272,6 +321,41 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Text("FREE", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
             ],
           ),
+          if (isBelowMinimum) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Minimum Order", style: GoogleFonts.poppins(color: Colors.white70)),
+                Text("₹${kMinimumOrderValue.toStringAsFixed(0)}", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Add more",
+                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    "₹${difference.toStringAsFixed(0)}",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const Divider(color: Colors.white24, height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -283,6 +367,157 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMinimumOrderWarning(CartProvider cart) {
+    final difference = kMinimumOrderValue - cart.totalAmount;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.orange.shade700, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Minimum order value is ₹${kMinimumOrderValue.toStringAsFixed(0)}. Add ₹${difference.toStringAsFixed(0)} more to place order.',
+              style: GoogleFonts.poppins(
+                color: Colors.orange.shade900,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Product> _getProductSuggestions(
+    List<Product> allProducts,
+    List<String> cartProductIds,
+    double targetAmount,
+  ) {
+    // Filter out products already in cart and out of stock
+    final availableProducts = allProducts.where((p) =>
+      !cartProductIds.contains(p.id) &&
+      p.stockQuantity > 0 &&
+      p.price <= targetAmount + 50 // Products within reasonable range
+    ).toList();
+    
+    // Sort by price closest to target amount
+    availableProducts.sort((a, b) {
+      final diffA = (a.price - targetAmount).abs();
+      final diffB = (b.price - targetAmount).abs();
+      return diffA.compareTo(diffB);
+    });
+    
+    // Return top 3 suggestions
+    return availableProducts.take(3).toList();
+  }
+
+  Widget _buildProductSuggestions(List<Product> suggestions) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Suggested Products',
+          style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: kPrimaryColor),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 120,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: suggestions.length,
+            itemBuilder: (context, index) {
+              final product = suggestions[index];
+              return Container(
+                width: 200,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                ),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => ProductScreen(productId: product.id)),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            product.images.isNotEmpty ? product.images.first : 'https://via.placeholder.com/60',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                product.name,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '₹${product.price.toStringAsFixed(0)}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: kAccentColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Consumer<CartProvider>(
+                          builder: (context, cart, _) {
+                            return IconButton(
+                              icon: const Icon(Icons.add_circle, color: kPrimaryColor, size: 24),
+                              onPressed: () {
+                                cart.addItem(CartItem(product: product, quantity: 1));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('${product.name} added to cart'),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

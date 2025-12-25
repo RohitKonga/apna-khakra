@@ -22,9 +22,14 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
   final _nameController = TextEditingController();
   final _slugController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _priceController = TextEditingController();
+  final _actualPriceController = TextEditingController();
+  final _marginPriceController = TextEditingController();
+  final _stockQuantityController = TextEditingController();
   final _imagesController = TextEditingController();
   bool _isSubmitting = false;
+  
+  // Calculated price display
+  double _calculatedPrice = 0;
 
   @override
   void initState() {
@@ -33,9 +38,24 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       _nameController.text = widget.product!.name;
       _slugController.text = widget.product!.slug;
       _descriptionController.text = widget.product!.description;
-      _priceController.text = widget.product!.price.toStringAsFixed(0);
+      _actualPriceController.text = widget.product!.actualPrice.toStringAsFixed(0);
+      _marginPriceController.text = widget.product!.marginPrice.toStringAsFixed(0);
+      _stockQuantityController.text = widget.product!.stockQuantity.toString();
       _imagesController.text = widget.product!.images.join(', ');
+      _calculatedPrice = widget.product!.price;
     }
+    
+    // Add listeners to calculate price automatically
+    _actualPriceController.addListener(_calculatePrice);
+    _marginPriceController.addListener(_calculatePrice);
+  }
+  
+  void _calculatePrice() {
+    final actualPrice = double.tryParse(_actualPriceController.text.trim()) ?? 0;
+    final marginPrice = double.tryParse(_marginPriceController.text.trim()) ?? 0;
+    setState(() {
+      _calculatedPrice = actualPrice + marginPrice;
+    });
   }
 
   @override
@@ -43,7 +63,11 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     _nameController.dispose();
     _slugController.dispose();
     _descriptionController.dispose();
-    _priceController.dispose();
+    _actualPriceController.removeListener(_calculatePrice);
+    _marginPriceController.removeListener(_calculatePrice);
+    _actualPriceController.dispose();
+    _marginPriceController.dispose();
+    _stockQuantityController.dispose();
     _imagesController.dispose();
     super.dispose();
   }
@@ -60,12 +84,25 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
           .where((s) => s.isNotEmpty)
           .toList();
 
+      final actualPrice = _actualPriceController.text.trim().isNotEmpty 
+          ? double.parse(_actualPriceController.text.trim()) 
+          : 0;
+      final marginPrice = _marginPriceController.text.trim().isNotEmpty 
+          ? double.parse(_marginPriceController.text.trim()) 
+          : 0;
+      final calculatedPrice = actualPrice + marginPrice;
+
       final product = Product(
         id: widget.product?.id ?? '',
         name: _nameController.text.trim(),
         slug: _slugController.text.trim(),
         description: _descriptionController.text.trim(),
-        price: double.parse(_priceController.text.trim()),
+        price: calculatedPrice, // Price is calculated from actualPrice + marginPrice
+        actualPrice: actualPrice,
+        marginPrice: marginPrice,
+        stockQuantity: _stockQuantityController.text.trim().isNotEmpty 
+            ? int.parse(_stockQuantityController.text.trim()) 
+            : 0,
         images: images,
         createdAt: widget.product?.createdAt ?? DateTime.now(),
       );
@@ -143,15 +180,80 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                 hint: "e.g. masala-khakhra",
                 validator: (v) => (v == null || v.isEmpty) ? 'Slug is required' : null,
               ),
+              const SizedBox(height: 32),
+              
+              Text(
+                "Admin Only - Pricing & Inventory",
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black38),
+              ),
+              const SizedBox(height: 16),
+              
+              _buildModernField(
+                controller: _actualPriceController,
+                label: "Actual Price (₹)",
+                icon: Icons.price_check_outlined,
+                hint: "0.00",
+                keyboardType: TextInputType.number,
+                validator: (v) => v != null && v.isNotEmpty && double.tryParse(v) == null ? 'Invalid price' : null,
+              ),
               const SizedBox(height: 20),
               
               _buildModernField(
-                controller: _priceController,
-                label: "Price (₹)",
-                icon: Icons.payments_outlined,
+                controller: _marginPriceController,
+                label: "Margin Price (₹)",
+                icon: Icons.trending_up_outlined,
                 hint: "0.00",
                 keyboardType: TextInputType.number,
-                validator: (v) => (v == null || double.tryParse(v) == null) ? 'Invalid price' : null,
+                validator: (v) => v != null && v.isNotEmpty && double.tryParse(v) == null ? 'Invalid price' : null,
+              ),
+              const SizedBox(height: 20),
+              
+              _buildModernField(
+                controller: _stockQuantityController,
+                label: "Stock Quantity",
+                icon: Icons.inventory_2_outlined,
+                hint: "0",
+                keyboardType: TextInputType.number,
+                validator: (v) => v != null && v.isNotEmpty && int.tryParse(v) == null ? 'Invalid quantity' : null,
+              ),
+              const SizedBox(height: 20),
+              
+              // Calculated Price Display
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: kPrimaryColor.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: kPrimaryColor.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.calculate_outlined, color: kPrimaryColor, size: 24),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Calculated Price (Shown to Users)",
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "₹${_calculatedPrice.toStringAsFixed(0)}",
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 32),
               
