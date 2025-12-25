@@ -144,50 +144,197 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  PreferredSizeWidget _buildElegantAppBar(BuildContext context) {
+PreferredSizeWidget _buildElegantAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: kBgColor.withOpacity(0.8),
       elevation: 0,
+      toolbarHeight: 85, // Increased height to accommodate labels
       centerTitle: false,
       title: Text(
-        'Apna Khakhra.',
+        'Apna Khakra.',
         style: GoogleFonts.dmSerifDisplay(
           color: kPrimaryColor,
           fontSize: 24,
           fontWeight: FontWeight.bold,
         ),
       ),
-actions: [
-  // 1. Login/Profile Button Logic
-  Consumer<AuthProvider>(
-    builder: (context, auth, _) {
-      return _circleIconButton(
-        auth.isAuthenticated ? Icons.person_outline : Icons.login_rounded, 
-        () {
-          if (!auth.isAuthenticated) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminLoginScreen()),
+      actions: [
+        // --- 1. SEARCH BAR ---
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 130, // Balanced width for search
+                height: 38,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: TextField(
+                  onChanged: _filterProducts,
+                  style: GoogleFonts.poppins(fontSize: 12, color: kPrimaryColor),
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: GoogleFonts.poppins(fontSize: 11, color: Colors.black26),
+                    border: InputBorder.none,
+                    prefixIcon: Icon(Icons.search, color: kPrimaryColor, size: 18),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Search',
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: kPrimaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // --- 2. LOGIN / PROFILE ---
+        Consumer<AuthProvider>(
+          builder: (context, auth, _) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => auth.isAuthenticated 
+                        ? const ProfileScreen() 
+                        : const AdminLoginScreen(),
+                    ),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
+                        ],
+                      ),
+                      child: Icon(
+                        auth.isAuthenticated ? Icons.person_outline : Icons.login_rounded,
+                        color: kPrimaryColor,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      auth.isAuthenticated ? 'Profile' : 'Login',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: kPrimaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+          },
+        ),
+
+        // --- 3. CART / BAG ---
+        Consumer<CartProvider>(
+          builder: (context, cart, _) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 12),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CartScreen()),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              )
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.shopping_bag_outlined,
+                            color: kPrimaryColor,
+                            size: 20,
+                          ),
+                        ),
+                        if (cart.itemCount > 0)
+                          Positioned(
+                            right: -2,
+                            top: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: kAccentColor,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                              child: Text(
+                                '${cart.itemCount}',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white, 
+                                  fontSize: 8, 
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Cart',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: kPrimaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
-          }
-        },
-      );
-    },
-  ),
-  
-  // 2. SEARCH BUTTON
-  _circleIconButton(Icons.search, () {
-    _showSearchDialog(context);
-  }),
-  
-  _buildCartButton(context),
-  const SizedBox(width: 12),
-],
+          },
+        ),
+      ],
     );
   }
 
@@ -316,7 +463,7 @@ class HeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            "Handcrafted whole-wheat khakhras\nwith organic spices.",
+            "Handcrafted whole-wheat khakras\nwith organic spices.",
             style: GoogleFonts.poppins(color: Colors.white70, fontSize: 16),
           ),
           const Spacer(),
@@ -451,7 +598,7 @@ class BrandStorySection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            "Every Khakhra is hand-pressed and slow-roasted on a traditional clay tawa to ensure you get that perfect heirloom taste.",
+            "Every Khakra is hand-pressed and slow-roasted on a traditional clay tawa to ensure you get that perfect heirloom taste.",
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.black54, height: 1.5),
           ),
