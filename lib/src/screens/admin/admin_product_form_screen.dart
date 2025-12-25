@@ -51,10 +51,10 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
   }
   
   void _calculatePrice() {
-    final actualPrice = double.tryParse(_actualPriceController.text.trim()) ?? 0;
-    final marginPrice = double.tryParse(_marginPriceController.text.trim()) ?? 0;
+    final actualPrice = double.tryParse(_actualPriceController.text.trim()) ?? 0.0;
+    final marginPrice = double.tryParse(_marginPriceController.text.trim()) ?? 0.0;
     setState(() {
-      _calculatedPrice = actualPrice + marginPrice;
+      _calculatedPrice = (actualPrice + marginPrice).toDouble();
     });
   }
 
@@ -86,11 +86,11 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
 
       final actualPrice = _actualPriceController.text.trim().isNotEmpty 
           ? double.parse(_actualPriceController.text.trim()) 
-          : 0;
+          : 0.0;
       final marginPrice = _marginPriceController.text.trim().isNotEmpty 
           ? double.parse(_marginPriceController.text.trim()) 
-          : 0;
-      final calculatedPrice = actualPrice + marginPrice;
+          : 0.0;
+      final calculatedPrice = (actualPrice + marginPrice).toDouble();
 
       final product = Product(
         id: widget.product?.id ?? '',
